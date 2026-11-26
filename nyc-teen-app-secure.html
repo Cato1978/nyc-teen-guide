@@ -104,7 +104,7 @@
         .search-btn { background: var(--primary); color: white; border: none; width: 38px; height: 38px; border-radius: 10px; font-size: 1.1em; cursor: pointer; }
         .gps-btn { background: #2ecc71; }
         .settings-btn { background: white; border: 2px solid #888; color: #888; }
-        .lang-btn { background: white; border: 2px solid var(--primary); font-size: 1.2em; cursor: pointer; position: relative; }
+        .lang-btn { background: var(--primary); color: white; border: none; font-size: 0.85em; font-weight: bold; cursor: pointer; position: relative; min-width: 38px; }
         .lang-dropdown { position: absolute; top: 45px; right: 0; background: white; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); overflow: hidden; display: none; z-index: 2000; min-width: 140px; }
         .lang-dropdown.show { display: block; }
         .lang-option { display: flex; align-items: center; gap: 10px; padding: 10px 15px; cursor: pointer; font-size: 0.9em; border-bottom: 1px solid #eee; }
@@ -345,17 +345,17 @@
             <div class="search-box">
                 <span>🔍</span>
                 <input type="text" class="search-input" id="searchInput" placeholder="Cerca indirizzo o zona..." autocomplete="off">
-                <button class="search-btn gps-btn" onclick="getMyLocation()" id="gpsBtn" title="Posizione GPS">📍</button>
-                <button class="search-btn" onclick="searchAddress()" id="searchBtn" title="Cerca">→</button>
-                <button class="search-btn lang-btn" onclick="toggleLangDropdown(event)" id="langBtn">🇮🇹</button>
+                <button class="search-btn gps-btn" onclick="getMyLocation()" id="gpsBtn" title="GPS">📍</button>
+                <button class="search-btn" onclick="searchAddress()" id="searchBtn" title="Search">→</button>
+                <button class="search-btn lang-btn" onclick="toggleLangDropdown(event)" id="langBtn">EN</button>
                 <div class="lang-dropdown" id="langDropdown">
-                    <div class="lang-option active" data-lang="it" onclick="changeLanguage('it')">🇮🇹 Italiano</div>
-                    <div class="lang-option" data-lang="en" onclick="changeLanguage('en')">🇬🇧 English</div>
-                    <div class="lang-option" data-lang="es" onclick="changeLanguage('es')">🇪🇸 Español</div>
-                    <div class="lang-option" data-lang="fr" onclick="changeLanguage('fr')">🇫🇷 Français</div>
-                    <div class="lang-option" data-lang="de" onclick="changeLanguage('de')">🇩🇪 Deutsch</div>
+                    <div class="lang-option" data-lang="en" onclick="changeLanguage('en')">🇬🇧 EN - English</div>
+                    <div class="lang-option" data-lang="it" onclick="changeLanguage('it')">🇮🇹 IT - Italiano</div>
+                    <div class="lang-option" data-lang="es" onclick="changeLanguage('es')">🇪🇸 ES - Español</div>
+                    <div class="lang-option" data-lang="fr" onclick="changeLanguage('fr')">🇫🇷 FR - Français</div>
+                    <div class="lang-option" data-lang="de" onclick="changeLanguage('de')">🇩🇪 DE - Deutsch</div>
                 </div>
-                <button class="search-btn settings-btn" onclick="toggleSettings()" title="Impostazioni">⚙️</button>
+                <button class="search-btn settings-btn" onclick="toggleSettings()" title="Settings">⚙️</button>
             </div>
             <div class="filter-chips" id="filterChips">
                 <div class="filter-chip active" data-cat="all" onclick="toggleFilter('all')">🗽 <span data-i18n="filters.all">Tutti</span></div>
@@ -583,7 +583,7 @@ Per revocare il consenso: Impostazioni → Cancella tutti i dati`);
         let currentLang = 'en';  // Default: English (app for NYC tourists)
         let translations = {};
         const availableLangs = ['en', 'it', 'es', 'fr', 'de'];  // English first
-        const langFlags = { it: '🇮🇹', en: '🇬🇧', es: '🇪🇸', fr: '🇫🇷', de: '🇩🇪' };
+        const langFlags = { en: 'EN', it: 'IT', es: 'ES', fr: 'FR', de: 'DE' };  // Text codes instead of flag emojis
 
         async function loadTranslations() {
             for (const lang of availableLangs) {
