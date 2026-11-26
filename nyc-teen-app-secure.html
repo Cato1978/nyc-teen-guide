@@ -101,6 +101,17 @@
         .search-container { background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); overflow: hidden; }
         .search-box { display: flex; align-items: center; padding: 10px 12px; gap: 8px; }
         .search-input { flex: 1; border: none; font-size: 0.95em; font-family: inherit; outline: none; background: transparent; }
+        .search-autocomplete { position: absolute; top: 100%; left: 0; right: 0; background: white; border-radius: 0 0 16px 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); max-height: 300px; overflow-y: auto; display: none; z-index: 1001; }
+        .search-autocomplete.show { display: block; }
+        .search-autocomplete-item { padding: 12px 15px; cursor: pointer; font-size: 0.9em; border-bottom: 1px solid #f0f0f0; display: flex; align-items: center; gap: 12px; }
+        .search-autocomplete-item:last-child { border-bottom: none; border-radius: 0 0 16px 16px; }
+        .search-autocomplete-item:hover { background: #f5f6fa; }
+        .search-autocomplete-item .icon { font-size: 1.3em; width: 30px; text-align: center; }
+        .search-autocomplete-item .details { flex: 1; }
+        .search-autocomplete-item .name { font-weight: 500; }
+        .search-autocomplete-item .address { font-size: 0.8em; color: #888; }
+        .search-autocomplete-item.place-result { border-left: 3px solid var(--primary); }
+        .search-autocomplete-item.address-result { border-left: 3px solid #2ecc71; }
         .search-btn { background: var(--primary); color: white; border: none; width: 38px; height: 38px; border-radius: 10px; font-size: 1.1em; cursor: pointer; }
         .gps-btn { background: #2ecc71; }
         .settings-btn { background: white; border: 2px solid #888; color: #888; }
@@ -352,9 +363,11 @@
         <div class="search-container">
             <div class="search-box">
                 <span>🔍</span>
-                <input type="text" class="search-input" id="searchInput" placeholder="Cerca indirizzo o zona..." autocomplete="off">
+                <input type="text" class="search-input" id="searchInput" placeholder="Search address or place..." autocomplete="off" oninput="handleSearchInput()" onkeydown="handleSearchKeydown(event)" onfocus="handleSearchInput()">
                 <button class="search-btn gps-btn" onclick="getMyLocation()" id="gpsBtn" title="GPS">📍</button>
                 <button class="search-btn" onclick="searchAddress()" id="searchBtn" title="Search">→</button>
+            </div>
+            <div class="search-autocomplete" id="searchAutocomplete"></div>
                 <button class="search-btn lang-btn" onclick="toggleLangDropdown(event)" id="langBtn">EN</button>
                 <div class="lang-dropdown" id="langDropdown">
                     <div class="lang-option" data-lang="en" onclick="changeLanguage('en')">🇬🇧 EN - English</div>
@@ -867,8 +880,176 @@ Per revocare il consenso: Impostazioni → Cancella tutti i dati`);
             if (userLocation) map.setView([userLocation.lat, userLocation.lng], 15); 
             else getMyLocation(); 
         }
+        
+        // ============ SEARCH AUTOCOMPLETE ============
+        let searchDebounceTimer = null;
+        let selectedSearchIndex = -1;
+        
+        function handleSearchInput() {
+            const query = document.getElementById('searchInput').value.trim().toLowerCase();
+            
+            // Clear previous timer
+            if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
+            
+            if (query.length < 2) {
+                hideSearchAutocomplete();
+                return;
+            }
+            
+            // Show places from database immediately
+            showPlaceSuggestions(query);
+            
+            // Debounce address search (API call)
+            searchDebounceTimer = setTimeout(() => {
+                fetchAddressSuggestions(query);
+            }, 300);
+        }
+        
+        function showPlaceSuggestions(query) {
+            const container = document.getElementById('searchAutocomplete');
+            
+            // Search in database
+            const matchingPlaces = places.filter(p => 
+                p.name.toLowerCase().includes(query) ||
+                p.address.toLowerCase().includes(query) ||
+                p.category.toLowerCase().includes(query)
+            ).slice(0, 5);
+            
+            if (matchingPlaces.length === 0) {
+                container.innerHTML = '<div class="search-autocomplete-item"><span class="icon">🔍</span><span>Searching...</span></div>';
+                container.classList.add('show');
+                return;
+            }
+            
+            const categoryEmojis = {
+                attractions: '🏛️', museums: '🎨', harrypotter: '⚡', food: '🍕',
+                shopping: '🛍️', movies: '🎬', iconic: '📸', newjersey: '🚂'
+            };
+            
+            container.innerHTML = matchingPlaces.map((p, i) => `
+                <div class="search-autocomplete-item place-result ${i === selectedSearchIndex ? 'selected' : ''}" 
+                     onclick="selectSearchPlace(${p.id})">
+                    <span class="icon">${p.emoji || categoryEmojis[p.category] || '📍'}</span>
+                    <div class="details">
+                        <div class="name">${p.name}</div>
+                        <div class="address">${p.address}</div>
+                    </div>
+                </div>
+            `).join('');
+            
+            container.classList.add('show');
+        }
+        
+        async function fetchAddressSuggestions(query) {
+            const container = document.getElementById('searchAutocomplete');
+            const nycBounds = '-74.3,40.4,-73.7,41.0';
+            
+            try {
+                const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&viewbox=${nycBounds}&bounded=1&limit=3`);
+                const data = await res.json();
+                
+                if (data.length > 0) {
+                    // Add address results to existing place results
+                    const addressHtml = data.map(r => `
+                        <div class="search-autocomplete-item address-result" 
+                             onclick="selectSearchAddress(${r.lat}, ${r.lon}, '${sanitizeInput(r.display_name).replace(/'/g, "\\'")}')">
+                            <span class="icon">📍</span>
+                            <div class="details">
+                                <div class="name">${r.display_name.split(',')[0]}</div>
+                                <div class="address">${r.display_name.split(',').slice(1, 3).join(',')}</div>
+                            </div>
+                        </div>
+                    `).join('');
+                    
+                    // Append to existing results
+                    container.innerHTML += addressHtml;
+                }
+            } catch(e) {
+                console.error('Address search error:', e);
+            }
+        }
+        
+        function selectSearchPlace(placeId) {
+            const place = places.find(p => p.id === placeId);
+            if (place) {
+                hideSearchAutocomplete();
+                document.getElementById('searchInput').value = place.name;
+                map.setView([place.lat, place.lng], 17);
+                
+                // Find and open the marker popup
+                markers.forEach(m => {
+                    if (m.placeId === placeId) {
+                        m.openPopup();
+                    }
+                });
+            }
+        }
+        
+        function selectSearchAddress(lat, lng, name) {
+            hideSearchAutocomplete();
+            document.getElementById('searchInput').value = name.split(',')[0];
+            userLocation = { lat: parseFloat(lat), lng: parseFloat(lng) };
+            if (userMarker) map.removeLayer(userMarker);
+            userMarker = L.marker([userLocation.lat, userLocation.lng], {
+                icon: L.divIcon({ html: '<div style="background:#e74c3c;width:16px;height:16px;border-radius:50%;border:3px solid white;box-shadow:0 0 10px rgba(231,76,60,0.5);"></div>', iconSize: [16,16], iconAnchor: [8,8] })
+            }).addTo(map).bindPopup('📍 ' + name.split(',')[0]);
+            map.setView([userLocation.lat, userLocation.lng], 16);
+            addAllMarkers();
+        }
+        
+        function hideSearchAutocomplete() {
+            document.getElementById('searchAutocomplete').classList.remove('show');
+            selectedSearchIndex = -1;
+        }
+        
+        function handleSearchKeydown(event) {
+            const container = document.getElementById('searchAutocomplete');
+            const items = container.querySelectorAll('.search-autocomplete-item');
+            
+            if (!container.classList.contains('show') || items.length === 0) {
+                if (event.key === 'Enter') {
+                    hideSearchAutocomplete();
+                    searchAddress();
+                }
+                return;
+            }
+            
+            if (event.key === 'ArrowDown') {
+                event.preventDefault();
+                selectedSearchIndex = Math.min(selectedSearchIndex + 1, items.length - 1);
+                updateSearchSelection(items);
+            } else if (event.key === 'ArrowUp') {
+                event.preventDefault();
+                selectedSearchIndex = Math.max(selectedSearchIndex - 1, -1);
+                updateSearchSelection(items);
+            } else if (event.key === 'Enter') {
+                event.preventDefault();
+                if (selectedSearchIndex >= 0 && items[selectedSearchIndex]) {
+                    items[selectedSearchIndex].click();
+                } else {
+                    hideSearchAutocomplete();
+                    searchAddress();
+                }
+            } else if (event.key === 'Escape') {
+                hideSearchAutocomplete();
+            }
+        }
+        
+        function updateSearchSelection(items) {
+            items.forEach((item, i) => {
+                item.classList.toggle('selected', i === selectedSearchIndex);
+            });
+        }
+        
+        // Hide search autocomplete when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.search-container')) {
+                hideSearchAutocomplete();
+            }
+        });
 
         async function searchAddress() {
+            hideSearchAutocomplete();
             const rawInput = document.getElementById('searchInput').value;
             const q = sanitizeInput(rawInput);
             if (!q) return;
