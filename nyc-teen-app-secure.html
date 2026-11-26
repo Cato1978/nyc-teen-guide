@@ -1,27 +1,26 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#667eea">
     
     <!-- ============ SICUREZZA MINORENNI - META TAGS ============ -->
     <!-- Content Security Policy - Permette ads Google + risorse necessarie -->
+    <!-- Nota: frame-ancestors e X-Frame-Options richiedono HTTP headers, non meta tags -->
     <meta http-equiv="Content-Security-Policy" content="
         default-src 'self';
         script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://pagead2.googlesyndication.com https://www.googletagservices.com https://adservice.google.com https://adservice.google.it;
         style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com;
         font-src https://fonts.gstatic.com;
         img-src 'self' data: https: blob:;
-        connect-src 'self' https://nominatim.openstreetmap.org https://pagead2.googlesyndication.com https://*.google.com https://*.doubleclick.net;
+        connect-src 'self' https://nominatim.openstreetmap.org https://pagead2.googlesyndication.com https://*.google.com https://*.doubleclick.net https://unpkg.com https://tile.openstreetmap.de;
         frame-src https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://*.googlesyndication.com;
-        frame-ancestors 'none';
         form-action 'self';
     ">
-    <!-- Blocca embedding in iframe (anti-clickjacking) -->
-    <meta http-equiv="X-Frame-Options" content="DENY">
     <!-- Blocca sniffing del content type -->
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <!-- Referrer Policy - Non invia informazioni a siti esterni -->
@@ -217,57 +216,57 @@
     <div class="privacy-modal" id="privacyModal">
         <div class="privacy-content">
             <div class="privacy-header">
-                <h2>🔒 La Tua Privacy</h2>
-                <p>Leggi prima di iniziare!</p>
+                <h2>🔒 Your Privacy</h2>
+                <p>Read before you start!</p>
             </div>
             <div class="privacy-body">
                 <div class="privacy-section">
-                    <h3>👋 Ciao!</h3>
-                    <p>Quest'app è stata creata pensando alla tua sicurezza. Ecco cosa devi sapere:</p>
+                    <h3>👋 Hi there!</h3>
+                    <p>This app was created with your safety in mind. Here's what you need to know:</p>
                 </div>
                 
                 <div class="privacy-section">
-                    <h3>📍 Posizione GPS</h3>
-                    <p>Usiamo il GPS <b>solo</b> per mostrarti i luoghi vicini sulla mappa.</p>
+                    <h3>📍 GPS Location</h3>
+                    <p>We use GPS <b>only</b> to show you nearby places on the map.</p>
                     <ul class="privacy-list">
-                        <li>La posizione resta <b>solo sul tuo telefono</b></li>
-                        <li>Non la salviamo su nessun server</li>
-                        <li>Non la condividiamo con nessuno</li>
-                        <li>Puoi disattivarla quando vuoi</li>
+                        <li>Your location stays <b>only on your phone</b></li>
+                        <li>We don't save it on any server</li>
+                        <li>We don't share it with anyone</li>
+                        <li>You can disable it anytime</li>
                     </ul>
                     <div class="privacy-toggle">
-                        <span>Consenti posizione GPS</span>
+                        <span>Allow GPS location</span>
                         <div class="toggle-switch active" id="gpsToggle" onclick="toggleGpsConsent()"></div>
                     </div>
                 </div>
                 
                 <div class="privacy-section">
-                    <h3>💾 Dati Salvati</h3>
-                    <p>Salviamo <b>solo sul tuo dispositivo</b>:</p>
+                    <h3>💾 Saved Data</h3>
+                    <p>We save <b>only on your device</b>:</p>
                     <ul class="privacy-list">
-                        <li>La lingua che preferisci</li>
-                        <li>Le tue preferenze (filtri, zoom)</li>
+                        <li>Your preferred language</li>
+                        <li>Your preferences (filters, zoom)</li>
                     </ul>
-                    <p style="margin-top:10px;color:#2ecc71;font-weight:600;">✅ Nessun account richiesto!</p>
+                    <p style="margin-top:10px;color:#2ecc71;font-weight:600;">✅ No account required!</p>
                 </div>
                 
                 <div class="privacy-section">
-                    <h3>🚫 Cosa NON facciamo</h3>
+                    <h3>🚫 What we DON'T do</h3>
                     <ul class="privacy-list">
-                        <li>❌ Non raccogliamo il tuo nome o email</li>
-                        <li>❌ Non tracciamo i tuoi movimenti</li>
-                        <li>❌ Non vendiamo nessun dato</li>
-                        <li>❌ Non mostriamo pubblicità personalizzate</li>
-                        <li>❌ Non permettiamo chat con sconosciuti</li>
+                        <li>❌ We don't collect your name or email</li>
+                        <li>❌ We don't track your movements</li>
+                        <li>❌ We don't sell any data</li>
+                        <li>❌ We don't show personalized ads</li>
+                        <li>❌ We don't allow chats with strangers</li>
                     </ul>
                 </div>
                 
                 <button class="privacy-btn primary" id="acceptBtn" onclick="acceptPrivacy()">
-                    ✅ Ho capito, iniziamo!
+                    ✅ Got it, let's go!
                 </button>
                 
                 <div class="parent-link">
-                    <a href="#" onclick="showParentInfo()">👨‍👩‍👧 Info per genitori</a>
+                    <a href="#" onclick="showParentInfo()">👨‍👩‍👧 Info for parents</a>
                 </div>
             </div>
         </div>
@@ -276,57 +275,57 @@
     <!-- ============ SETTINGS PANEL ============ -->
     <div class="settings-panel" id="settingsPanel">
         <div class="settings-header">
-            <h3>⚙️ Impostazioni</h3>
+            <h3>⚙️ Settings</h3>
             <button class="settings-close" onclick="toggleSettings()">×</button>
         </div>
         <div class="settings-body">
             <div class="settings-section">
                 <h4>🔒 Privacy</h4>
                 <div class="settings-item">
-                    <span>Posizione GPS</span>
+                    <span>GPS Location</span>
                     <div class="toggle-switch" id="settingsGpsToggle" onclick="toggleGpsSetting()"></div>
                 </div>
                 <div class="settings-info">
-                    ℹ️ La posizione GPS viene usata solo per mostrarti i luoghi vicini. Non viene mai salvata o condivisa.
+                    ℹ️ GPS is used only to show you nearby places. It's never saved or shared.
                 </div>
             </div>
             
             <div class="settings-section">
-                <h4>📊 I Tuoi Dati</h4>
+                <h4>📊 Your Data</h4>
                 <p style="font-size:0.85em;color:#666;margin-bottom:10px;">
-                    Tutti i dati sono salvati solo sul tuo dispositivo. Nessun dato viene inviato a server esterni.
+                    All data is saved only on your device. No data is sent to external servers.
                 </p>
                 <div class="settings-item">
-                    <span>Lingua salvata</span>
-                    <span id="savedLangDisplay">Italiano</span>
+                    <span>Saved language</span>
+                    <span id="savedLangDisplay">English</span>
                 </div>
                 <div class="settings-item">
-                    <span>Consenso privacy</span>
-                    <span style="color:#2ecc71;">✅ Accettato</span>
+                    <span>Privacy consent</span>
+                    <span style="color:#2ecc71;">✅ Accepted</span>
                 </div>
                 <button class="data-btn" onclick="deleteAllData()">
-                    🗑️ Cancella tutti i miei dati
+                    🗑️ Delete all my data
                 </button>
             </div>
             
             <div class="settings-section">
-                <h4>👨‍👩‍👧 Per i Genitori</h4>
+                <h4>👨‍👩‍👧 For Parents</h4>
                 <p style="font-size:0.85em;color:#666;line-height:1.5;">
-                    Quest'app è progettata per essere <b>sicura per i minori</b> secondo le normative GDPR-K e COPPA:
+                    This app is designed to be <b>safe for minors</b> according to GDPR-K and COPPA regulations:
                 </p>
                 <ul style="font-size:0.8em;color:#666;padding-left:20px;margin-top:10px;">
-                    <li>Nessuna registrazione richiesta</li>
-                    <li>Nessuna raccolta di dati personali</li>
-                    <li>Nessuna pubblicità personalizzata</li>
-                    <li>Nessuna funzione social/chat</li>
-                    <li>Contenuti verificati e appropriati</li>
+                    <li>No registration required</li>
+                    <li>No personal data collection</li>
+                    <li>No personalized advertising</li>
+                    <li>No social/chat features</li>
+                    <li>Verified and appropriate content</li>
                 </ul>
             </div>
             
             <div class="settings-section">
-                <h4>📧 Contatti</h4>
+                <h4>📧 Contact</h4>
                 <p style="font-size:0.85em;color:#666;">
-                    Per domande sulla privacy:<br>
+                    For privacy questions:<br>
                     <a href="mailto:privacy@nycteenguide.app" style="color:var(--primary);">privacy@nycteenguide.app</a>
                 </p>
             </div>
@@ -336,7 +335,7 @@
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loading-emoji">🗽</div>
         <div class="loading-text">NYC Teen Guide</div>
-        <div class="loading-sub" id="loadingSub">Caricamento 500 luoghi...</div>
+        <div class="loading-sub" id="loadingSub">Loading 500+ places...</div>
     </div>
     
     <div id="map"></div>
@@ -581,9 +580,9 @@ Per revocare il consenso: Impostazioni → Cancella tutti i dati`);
         }
         
         // ============ i18n SYSTEM ============
-        let currentLang = 'it';
+        let currentLang = 'en';  // Default: English (app for NYC tourists)
         let translations = {};
-        const availableLangs = ['it', 'en', 'es', 'fr', 'de'];
+        const availableLangs = ['en', 'it', 'es', 'fr', 'de'];  // English first
         const langFlags = { it: '🇮🇹', en: '🇬🇧', es: '🇪🇸', fr: '🇫🇷', de: '🇩🇪' };
 
         async function loadTranslations() {
@@ -1576,7 +1575,7 @@ Per revocare il consenso: Impostazioni → Cancella tutti i dati`);
             
             // Handle purchase
             purchase() {
-                alert('🚧 Acquisti in-app disponibili prossimamente!\\n\\nPer ora goditi l\\'app gratis con il limite giornaliero.');
+                alert('🚧 Acquisti in-app disponibili prossimamente!\n\nPer ora goditi l\'app gratis con il limite giornaliero.');
                 document.getElementById('premiumModal')?.remove();
                 // TODO: Integrare Google Play Billing
                 // https://developer.android.com/google/play/billing
