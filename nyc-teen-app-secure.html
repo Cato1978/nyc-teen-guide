@@ -158,6 +158,25 @@
         .place-suggestion { display: flex; align-items: center; gap: 10px; cursor: pointer; background: white; border-radius: 10px; padding: 10px; margin-top: 8px; border: 1px solid #eee; }
         .place-suggestion:hover { background: #f8f9fa; }
         .place-suggestion .emoji { font-size: 1.5em; }
+        .itinerary-themes { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+        .theme-btn { display: flex; align-items: center; gap: 12px; padding: 12px 15px; background: white; border: 2px solid #eee; border-radius: 12px; cursor: pointer; transition: all 0.2s; }
+        .theme-btn:hover { border-color: var(--primary); background: #f8f9fa; }
+        .theme-btn .theme-icon { font-size: 1.8em; }
+        .theme-btn .theme-info { flex: 1; text-align: left; }
+        .theme-btn .theme-name { font-weight: 600; font-size: 0.95em; }
+        .theme-btn .theme-desc { font-size: 0.75em; color: #888; }
+        .itinerary-actions { display: flex; gap: 8px; margin-top: 15px; flex-wrap: wrap; }
+        .itinerary-actions button { flex: 1; min-width: 120px; padding: 10px 15px; border: none; border-radius: 10px; font-size: 0.85em; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .btn-download { background: #2ecc71; color: white; }
+        .btn-share { background: #3498db; color: white; }
+        .btn-map { background: var(--primary); color: white; }
+        .itinerary-step { display: flex; align-items: flex-start; gap: 12px; padding: 12px; background: white; border-radius: 10px; margin-top: 8px; border-left: 4px solid var(--primary); }
+        .step-number { width: 28px; height: 28px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85em; flex-shrink: 0; }
+        .step-time { font-size: 0.7em; color: white; background: #888; padding: 2px 6px; border-radius: 10px; margin-left: 5px; }
+        .step-content { flex: 1; }
+        .step-name { font-weight: 600; font-size: 0.9em; display: flex; align-items: center; gap: 6px; }
+        .step-details { font-size: 0.75em; color: #666; margin-top: 3px; }
+        .step-tip { font-size: 0.7em; color: #27ae60; margin-top: 5px; font-style: italic; }
         .place-suggestion .info { flex: 1; }
         .place-suggestion .name { font-weight: 600; font-size: 0.9em; }
         .place-suggestion .meta { font-size: 0.75em; color: #888; }
@@ -1331,6 +1350,250 @@ Per revocare il consenso: Impostazioni → Cancella tutti i dati`);
             return itinerary;
         }
         
+        // ============ THEMED ITINERARIES SYSTEM ============
+        const themedItineraries = {
+            harrypotter: {
+                name: 'Harry Potter Magic Day',
+                icon: '⚡',
+                color: '#9B59B6',
+                description: 'A magical day for Potterheads!',
+                placeIds: [81, 82, 84, 85, 90], // HP Store, Butterbeer, Ollivanders, Honeydukes, Cursed Child
+                schedule: ['10:00', '11:30', '12:30', '14:00', '19:00'],
+                tips: [
+                    'Arrive early - the store gets crowded!',
+                    'Try the frozen butterbeer in summer',
+                    'Interactive wands work throughout the store',
+                    'Get Chocolate Frogs as souvenirs',
+                    'Book lottery tickets for $40!'
+                ]
+            },
+            classics: {
+                name: 'NYC Classics',
+                icon: '🗽',
+                color: '#3498DB',
+                description: 'The must-see NYC landmarks!',
+                placeIds: [12, 9, 10, 1, 11], // Statue of Liberty, Brooklyn Bridge, DUMBO, Empire State, Times Square
+                schedule: ['8:30', '12:00', '13:00', '16:00', '19:00'],
+                tips: [
+                    'Book ferry tickets weeks in advance!',
+                    'Start from Manhattan side',
+                    'Best photo spot in Washington St',
+                    'Go 30 min before sunset!',
+                    'Better at night with all the lights'
+                ]
+            },
+            foodie: {
+                name: 'Foodie Tour',
+                icon: '🍕',
+                color: '#F39C12',
+                description: 'The best NYC eats in one day!',
+                placeIds: [102, 109, 101, 104, 119], // Joe's Pizza, Russ & Daughters, Levain, Magnolia, Serendipity
+                schedule: ['11:00', '13:00', '15:00', '16:30', '18:30'],
+                tips: [
+                    'Get the plain cheese slice!',
+                    'Try lox and schmear on a bagel',
+                    'Chocolate chip walnut cookie is the best!',
+                    'Banana pudding is a must!',
+                    'Frozen hot chocolate is iconic'
+                ]
+            },
+            instagram: {
+                name: 'Instagram Perfect Day',
+                icon: '📸',
+                color: '#E91E63',
+                description: 'Most photogenic spots in NYC!',
+                placeIds: [10, 5, 20, 15, 2], // DUMBO, SUMMIT, Little Island, Oculus, Top of the Rock
+                schedule: ['7:00', '10:00', '12:30', '15:00', '17:30'],
+                tips: [
+                    'Go at 7am for empty streets!',
+                    'Wear colorful clothes for mirrors',
+                    'Book on weekends in advance',
+                    'Symmetric photo from center',
+                    'Book sunset slot for best photos'
+                ]
+            },
+            movies: {
+                name: 'Movie Locations Tour',
+                icon: '🎬',
+                color: '#E74C3C',
+                description: 'Walk where movies were filmed!',
+                placeIds: [233, 231, 232, 239, 237], // Friends, Home Alone Plaza, Ghostbusters, Gossip Girl Met, Night at Museum
+                schedule: ['10:00', '12:00', '14:00', '15:30', '17:00'],
+                tips: [
+                    'No Central Perk inside - just exterior',
+                    'Lobby photo is free!',
+                    'Still an active firehouse!',
+                    'Front steps for the classic shot',
+                    'See the actual T-Rex!'
+                ]
+            }
+        };
+        
+        let currentItinerary = null;
+        
+        function generateThemedItinerary(theme) {
+            const itineraryData = themedItineraries[theme];
+            if (!itineraryData) return;
+            
+            // Get places from IDs, with fallback if place not found
+            const itineraryPlaces = itineraryData.placeIds
+                .map(id => places.find(p => p.id === id))
+                .filter(p => p !== undefined);
+            
+            if (itineraryPlaces.length === 0) {
+                addMessage('Sorry, could not generate this itinerary. Try another theme!', 'bot');
+                return;
+            }
+            
+            // Store current itinerary for download
+            currentItinerary = {
+                theme: itineraryData,
+                places: itineraryPlaces
+            };
+            
+            // Build the response
+            let response = `<div style="background:linear-gradient(135deg, ${itineraryData.color}22, ${itineraryData.color}11); padding:15px; border-radius:12px; border-left:4px solid ${itineraryData.color};">
+                <div style="font-size:1.5em; margin-bottom:5px;">${itineraryData.icon} <b>${itineraryData.name}</b></div>
+                <div style="font-size:0.85em; color:#666; margin-bottom:15px;">${itineraryData.description}</div>
+            </div>`;
+            
+            let totalCost = 0;
+            let totalTime = 0;
+            
+            itineraryPlaces.forEach((place, index) => {
+                totalCost += place.cost;
+                totalTime += place.duration;
+                const time = itineraryData.schedule[index] || '';
+                const tip = itineraryData.tips[index] || '';
+                
+                response += `
+                <div class="itinerary-step" style="border-left-color: ${itineraryData.color};" onclick="focusPlace(${place.id})">
+                    <div class="step-number" style="background: ${itineraryData.color};">${index + 1}</div>
+                    <div class="step-content">
+                        <div class="step-name">
+                            ${place.emoji} ${place.name}
+                            <span class="step-time">${time}</span>
+                        </div>
+                        <div class="step-details">
+                            📍 ${place.address} • ⏱️ ${formatDuration(place.duration)} • ${place.cost === 0 ? '🆓 Free' : '💵 $' + place.cost}
+                        </div>
+                        ${tip ? `<div class="step-tip">💡 ${tip}</div>` : ''}
+                    </div>
+                </div>`;
+            });
+            
+            // Summary
+            response += `<div style="background:#e8f5e9; padding:12px; border-radius:10px; margin-top:15px;">
+                <b>📊 Summary:</b> ${itineraryPlaces.length} stops • ${formatDuration(totalTime + (itineraryPlaces.length * 30))} total • ${totalCost === 0 ? 'All FREE!' : '$' + totalCost + ' total'}
+            </div>`;
+            
+            // Action buttons
+            response += `<div class="itinerary-actions">
+                <button class="btn-download" onclick="downloadItinerary()">📥 Download</button>
+                <button class="btn-share" onclick="shareItinerary()">📤 Share</button>
+                <button class="btn-map" onclick="showItineraryOnMap()">🗺️ Show on Map</button>
+            </div>`;
+            
+            addMessage(response, 'bot');
+        }
+        
+        function downloadItinerary() {
+            if (!currentItinerary) return;
+            
+            const { theme, places: itinPlaces } = currentItinerary;
+            let text = `NYC TEEN GUIDE - ${theme.name}\n`;
+            text += `${'='.repeat(40)}\n\n`;
+            text += `${theme.description}\n\n`;
+            
+            itinPlaces.forEach((place, i) => {
+                const time = theme.schedule[i] || '';
+                const tip = theme.tips[i] || '';
+                text += `${i + 1}. ${place.name} (${time})\n`;
+                text += `   📍 ${place.address}\n`;
+                text += `   ⏱️ ${formatDuration(place.duration)} | ${place.cost === 0 ? 'Free' : '$' + place.cost}\n`;
+                if (tip) text += `   💡 Tip: ${tip}\n`;
+                text += `\n`;
+            });
+            
+            const totalCost = itinPlaces.reduce((sum, p) => sum + p.cost, 0);
+            text += `${'='.repeat(40)}\n`;
+            text += `TOTAL: ${itinPlaces.length} stops | $${totalCost}\n\n`;
+            text += `Generated by NYC Teen Guide\n`;
+            text += `https://cato1978.github.io/nyc-teen-guide/\n`;
+            
+            // Download as text file
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `NYC-Itinerary-${theme.name.replace(/\s+/g, '-')}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        function shareItinerary() {
+            if (!currentItinerary) return;
+            
+            const { theme, places: itinPlaces } = currentItinerary;
+            let text = `🗽 My NYC ${theme.name} Itinerary:\n\n`;
+            itinPlaces.forEach((place, i) => {
+                text += `${i + 1}. ${place.emoji} ${place.name}\n`;
+            });
+            text += `\n📱 Plan yours: https://cato1978.github.io/nyc-teen-guide/`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: `NYC ${theme.name}`,
+                    text: text,
+                    url: 'https://cato1978.github.io/nyc-teen-guide/'
+                }).catch(() => {
+                    copyToClipboard(text);
+                });
+            } else {
+                copyToClipboard(text);
+            }
+        }
+        
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('📋 Itinerary copied to clipboard!');
+            }).catch(() => {
+                alert('Could not copy. Please try again.');
+            });
+        }
+        
+        function showItineraryOnMap() {
+            if (!currentItinerary) return;
+            
+            const { places: itinPlaces } = currentItinerary;
+            
+            // Close chat
+            document.getElementById('chatContainer').classList.remove('open');
+            
+            // Clear current filters and show all
+            activeFilters.clear();
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            document.querySelector('.filter-chip[data-cat="all"]')?.classList.add('active');
+            
+            // Fit map to show all itinerary places
+            if (itinPlaces.length > 0) {
+                const bounds = L.latLngBounds(itinPlaces.map(p => [p.lat, p.lng]));
+                map.fitBounds(bounds, { padding: [50, 50] });
+                
+                // Open first place popup
+                setTimeout(() => {
+                    const firstPlace = itinPlaces[0];
+                    markers.forEach(m => {
+                        if (m.placeId === firstPlace.id) {
+                            m.openPopup();
+                        }
+                    });
+                }, 500);
+            }
+        }
+        
         // Quartieri di NYC per ricerca per zona
         const neighborhoods = {
             'soho': { bounds: [40.719, -74.005, 40.728, -73.995], name: 'SoHo' },
@@ -1411,31 +1674,48 @@ Per revocare il consenso: Impostazioni → Cancella tutti i dati`);
             
             // ============ NUOVE FUNZIONALITÀ ============
             
-            // 1. ITINERARIO GIORNALIERO (Free unlimited)
+            // 1. ITINERARIO GIORNALIERO - Mostra opzioni tematiche
             if (matchKeyword('itinerary')) {
                 response = currentLang === 'en' 
-                    ? '🗓️ <b>Here\'s your perfect itinerary for today!</b><br>Optimized route so you don\'t waste time:'
-                    : '🗓️ <b>Ecco il tuo itinerario perfetto per oggi!</b><br>Percorso ottimizzato per non perdere tempo:';
-                const itinerary = generateItinerary(userLocation);
-                let totalCost = 0, totalTime = 0;
-                const freeText = currentLang === 'en' ? 'Free' : 'Gratis';
-                itinerary.forEach((p, i) => {
-                    totalCost += p.cost;
-                    totalTime += p.duration;
-                    const timeEmoji = i === 0 ? '🌅' : i === itinerary.length - 1 ? '🌙' : '☀️';
-                    response += `<div class="place-suggestion" onclick="focusPlace(${p.id})" style="border-left: 3px solid ${catColors[p.category]};">
-                        <span class="emoji">${timeEmoji} ${i+1}.</span>
-                        <div class="info">
-                            <div class="name">${p.emoji} ${sanitizeInput(p.name)}</div>
-                            <div class="meta">${formatDuration(p.duration)} • ${p.cost === 0 ? freeText : '$' + p.cost}</div>
+                    ? '🗓️ <b>Choose your perfect day in NYC!</b><br>Pick a theme that suits you:'
+                    : '🗓️ <b>Scegli la tua giornata perfetta a NYC!</b><br>Seleziona un tema:';
+                
+                response += `<div class="itinerary-themes">
+                    <div class="theme-btn" onclick="generateThemedItinerary('harrypotter')">
+                        <span class="theme-icon">⚡</span>
+                        <div class="theme-info">
+                            <div class="theme-name">Harry Potter Magic Day</div>
+                            <div class="theme-desc">HP Store, Butterbeer, Cursed Child & more</div>
                         </div>
-                        <button class="go-btn" onclick="event.stopPropagation();openNav(${p.lat},${p.lng},'${sanitizeInput(p.name).replace(/'/g,"\\'")}')">📍</button>
-                    </div>`;
-                });
-                const allFreeText = currentLang === 'en' ? 'All free!' : 'Tutto gratis!';
-                const totalText = currentLang === 'en' ? 'Total' : 'Totale';
-                response += `<div style="background:#e8f5e9;padding:10px;border-radius:8px;margin-top:10px;font-size:0.85em;">
-                    📊 <b>${totalText}:</b> ${formatDuration(totalTime)} • ${totalCost === 0 ? allFreeText : '$' + totalCost}
+                    </div>
+                    <div class="theme-btn" onclick="generateThemedItinerary('classics')">
+                        <span class="theme-icon">🗽</span>
+                        <div class="theme-info">
+                            <div class="theme-name">NYC Classics</div>
+                            <div class="theme-desc">Statue of Liberty, Empire State, Brooklyn Bridge</div>
+                        </div>
+                    </div>
+                    <div class="theme-btn" onclick="generateThemedItinerary('foodie')">
+                        <span class="theme-icon">🍕</span>
+                        <div class="theme-info">
+                            <div class="theme-name">Foodie Tour</div>
+                            <div class="theme-desc">Best pizza, bagels, cookies & local eats</div>
+                        </div>
+                    </div>
+                    <div class="theme-btn" onclick="generateThemedItinerary('instagram')">
+                        <span class="theme-icon">📸</span>
+                        <div class="theme-info">
+                            <div class="theme-name">Instagram Perfect Day</div>
+                            <div class="theme-desc">DUMBO, Top of the Rock, Vessel & viral spots</div>
+                        </div>
+                    </div>
+                    <div class="theme-btn" onclick="generateThemedItinerary('movies')">
+                        <span class="theme-icon">🎬</span>
+                        <div class="theme-info">
+                            <div class="theme-name">Movie Locations Tour</div>
+                            <div class="theme-desc">Friends, Home Alone, Spider-Man & more</div>
+                        </div>
+                    </div>
                 </div>`;
                 return response;
             }
