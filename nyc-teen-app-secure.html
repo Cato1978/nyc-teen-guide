@@ -510,7 +510,42 @@
             PrivacyManager.acceptConsent();
             PrivacyManager.setGpsPermission(gpsConsentGiven);
             document.getElementById('privacyModal').classList.add('hidden');
-            initApp();
+            
+            // Show interstitial ad on first launch only
+            showInterstitialAd(function() {
+                initApp();
+            });
+        }
+        
+        // Interstitial Ad - shows once after privacy consent
+        function showInterstitialAd(callback) {
+            // Check if already shown this session
+            if (sessionStorage.getItem('interstitialShown')) {
+                callback();
+                return;
+            }
+            
+            // Mark as shown for this session
+            sessionStorage.setItem('interstitialShown', 'true');
+            
+            // For PWA in browser, AdMob interstitial requires native wrapper
+            // This will work when packaged as APK via PWABuilder/Bubblewrap
+            if (window.admob && window.admob.interstitial) {
+                // Native AdMob SDK available (TWA/Capacitor)
+                window.admob.interstitial.load({
+                    id: 'ca-app-pub-4749968211872155/4749660459'
+                }).then(() => {
+                    return window.admob.interstitial.show();
+                }).then(() => {
+                    callback();
+                }).catch(() => {
+                    callback(); // Continue even if ad fails
+                });
+            } else {
+                // Fallback: show brief splash then continue
+                // Interstitial will work in native APK version
+                callback();
+            }
         }
         
         function showParentInfo() {
