@@ -1044,9 +1044,21 @@ Per revocare il consenso: Impostazioni → Cancella tutti i dati`);
             
             // ============ NUOVE FUNZIONALITÀ ============
             
-            // 1. ITINERARIO GIORNALIERO
+            // 1. ITINERARIO GIORNALIERO (Premium: 1 gratis/giorno)
             if (matchKeyword('itinerary')) {
-                response = '🗓️ <b>Ecco il tuo itinerario perfetto per oggi!</b><br>Percorso ottimizzato per non perdere tempo:';
+                // Check if user can use this feature
+                if (!PremiumManager.canUseFeature('itinerary')) {
+                    PremiumManager.showUpgradePrompt('itinerary');
+                    return '⚠️ Hai già usato l\'itinerario gratuito di oggi!<br><br>💎 <b>Passa a PRO</b> per itinerari illimitati, oppure torna domani! 😊';
+                }
+                
+                // Track usage for free users
+                PremiumManager.trackUsage('itinerary');
+                
+                const remaining = PremiumManager.getRemainingUses('itinerary');
+                const premiumBadge = PremiumManager.isPremium() ? ' 💎' : ` <small style="color:#888;">(${remaining} rimasto oggi)</small>`;
+                
+                response = '🗓️ <b>Ecco il tuo itinerario perfetto per oggi!</b>' + premiumBadge + '<br>Percorso ottimizzato per non perdere tempo:';
                 const itinerary = generateItinerary(userLocation);
                 let totalCost = 0, totalTime = 0;
                 itinerary.forEach((p, i) => {
@@ -1121,7 +1133,7 @@ Per revocare il consenso: Impostazioni → Cancella tutti i dati`);
                     return response;
                 }
             }
-            // 6. TOP 10 MIGLIORI
+            // 6. TOP 10 MIGLIORI (gratuito)
             else if (matchKeyword('top10')) {
                 response = '🏆 <b>TOP 10 posti imperdibili di NYC:</b>';
                 suggestions = [...places].sort((a,b) => {
@@ -1129,6 +1141,11 @@ Per revocare il consenso: Impostazioni → Cancella tutti i dati`);
                     const scoreB = b.rating * 2 + b.importance;
                     return scoreB - scoreA;
                 }).slice(0, 10);
+                
+                // Add premium upsell
+                if (!PremiumManager.isPremium()) {
+                    response += '<div style="background:#f0f0f0;padding:10px;border-radius:8px;margin-top:10px;font-size:0.85em;">💎 <b>PRO:</b> Sblocca Top 10 per ogni quartiere!</div>';
+                }
             }
             // 7. RANDOM / SORPRESA
             else if (matchKeyword('random')) {
@@ -1139,7 +1156,7 @@ Per revocare il consenso: Impostazioni → Cancella tutti i dati`);
                 const others = places.filter(p => p.id !== randomPlace.id).sort(() => Math.random() - 0.5).slice(0, 2);
                 suggestions.push(...others);
             }
-            // 8. RICERCA PER QUARTIERE/ZONA
+            // 8. RICERCA PER QUARTIERE/ZONA (Top 10 quartiere = Premium)
             else {
                 let foundNeighborhood = null;
                 for (const [key, hood] of Object.entries(neighborhoods)) {
@@ -1149,6 +1166,13 @@ Per revocare il consenso: Impostazioni → Cancella tutti i dati`);
                     }
                 }
                 if (foundNeighborhood) {
+                    // Check premium for detailed neighborhood search
+                    if (!PremiumManager.canUseFeature('top10_neighborhood')) {
+                        PremiumManager.showUpgradePrompt('top10_neighborhood');
+                        return `📍 <b>${foundNeighborhood.name}</b> - Quartiere interessante!<br><br>⚠️ Hai già usato la ricerca quartiere oggi.<br>💎 <b>Passa a PRO</b> per esplorare tutti i quartieri!`;
+                    }
+                    PremiumManager.trackUsage('top10_neighborhood');
+                    
                     const [minLat, minLng, maxLat, maxLng] = foundNeighborhood.bounds;
                     response = `📍 <b>A ${foundNeighborhood.name}:</b>`;
                     suggestions = places.filter(p => 
@@ -1420,6 +1444,7 @@ Per revocare il consenso: Impostazioni → Cancella tutti i dati`);
         // ============ PREMIUM & ADS SYSTEM ============
         const PremiumManager = {
             STORAGE_KEY: 'nycGuide_premium',
+            USAGE_KEY: 'nycGuide_dailyUsage',
             
             isPremium() {
                 return localStorage.getItem(this.STORAGE_KEY) === 'true';
@@ -1430,39 +1455,83 @@ Per revocare il consenso: Impostazioni → Cancella tutti i dati`);
                 this.updateUI();
             },
             
+            // Get today's date string
+            getToday() {
+                return new Date().toISOString().split('T')[0];
+            },
+            
+            // Get daily usage data
+            getDailyUsage() {
+                const data = localStorage.getItem(this.USAGE_KEY);
+                if (!data) return { date: this.getToday(), itinerary: 0, top10: 0 };
+                const parsed = JSON.parse(data);
+                // Reset if it's a new day
+                if (parsed.date !== this.getToday()) {
+                    return { date: this.getToday(), itinerary: 0, top10: 0 };
+                }
+                return parsed;
+            },
+            
+            // Save daily usage
+            saveDailyUsage(usage) {
+                localStorage.setItem(this.USAGE_KEY, JSON.stringify(usage));
+            },
+            
+            // Check if free user can use feature (1 per day)
+            canUseFeature(feature) {
+                if (this.isPremium()) return true;
+                
+                const usage = this.getDailyUsage();
+                if (feature === 'itinerary' && usage.itinerary >= 1) return false;
+                if (feature === 'top10_neighborhood' && usage.top10 >= 1) return false;
+                
+                return true;
+            },
+            
+            // Track feature usage
+            trackUsage(feature) {
+                if (this.isPremium()) return;
+                
+                const usage = this.getDailyUsage();
+                if (feature === 'itinerary') usage.itinerary++;
+                if (feature === 'top10_neighborhood') usage.top10++;
+                this.saveDailyUsage(usage);
+            },
+            
+            // Get remaining uses for free users
+            getRemainingUses(feature) {
+                if (this.isPremium()) return '∞';
+                const usage = this.getDailyUsage();
+                if (feature === 'itinerary') return Math.max(0, 1 - usage.itinerary);
+                if (feature === 'top10_neighborhood') return Math.max(0, 1 - usage.top10);
+                return 1;
+            },
+            
             updateUI() {
                 const adBanner = document.getElementById('adBanner');
                 const chatContainer = document.getElementById('chatContainer');
                 
                 if (this.isPremium()) {
-                    // Hide ads for premium users
                     if (adBanner) adBanner.classList.add('hidden');
                     if (chatContainer) chatContainer.classList.add('ad-hidden');
                 } else {
-                    // Show ads for free users
                     if (adBanner) adBanner.classList.remove('hidden');
                     if (chatContainer) chatContainer.classList.remove('ad-hidden');
                 }
             },
             
-            // Check if feature requires premium
-            requiresPremium(feature) {
-                const premiumFeatures = ['itinerary_full', 'offline_complete', 'no_ads', 'top10_neighborhood'];
-                return premiumFeatures.includes(feature);
-            },
-            
             // Show upgrade prompt
             showUpgradePrompt(feature) {
                 const featureNames = {
-                    'itinerary_full': 'Itinerario Completo',
+                    'itinerary': 'Itinerari Illimitati',
+                    'top10_neighborhood': 'Top 10 per Quartiere',
                     'offline_complete': 'Modalità Offline Completa',
-                    'no_ads': 'Rimuovi Pubblicità',
-                    'top10_neighborhood': 'Top 10 per Quartiere'
+                    'no_ads': 'Rimuovi Pubblicità'
                 };
                 
                 const name = featureNames[feature] || feature;
+                const usage = this.getDailyUsage();
                 
-                // Create modal
                 const modal = document.createElement('div');
                 modal.id = 'premiumModal';
                 modal.innerHTML = `
@@ -1474,24 +1543,29 @@ Per revocare il consenso: Impostazioni → Cancella tutti i dati`);
                                 <p style="font-size:0.9em;opacity:0.9;">Sblocca tutte le funzioni!</p>
                             </div>
                             <div style="padding:20px;">
+                                <div style="background:#fff3cd;padding:12px;border-radius:10px;margin-bottom:15px;text-align:center;">
+                                    <span style="font-size:1.5em;">⚠️</span><br>
+                                    <b>Hai usato il tuo uso gratuito di oggi!</b><br>
+                                    <small style="color:#856404;">Torna domani o passa a PRO</small>
+                                </div>
                                 <p style="font-size:0.95em;color:#333;margin-bottom:15px;">
-                                    <b>${name}</b> è una funzione Premium.
+                                    Con <b>PRO</b> ottieni:
                                 </p>
                                 <ul style="font-size:0.85em;color:#666;padding-left:20px;margin-bottom:20px;">
-                                    <li>✅ Itinerari personalizzati illimitati</li>
-                                    <li>✅ Modalità offline completa</li>
-                                    <li>✅ Nessuna pubblicità</li>
+                                    <li>✅ Itinerari personalizzati <b>illimitati</b></li>
                                     <li>✅ Top 10 per ogni quartiere</li>
+                                    <li>✅ Modalità offline completa</li>
+                                    <li>✅ <b>Zero pubblicità</b></li>
                                 </ul>
                                 <div style="text-align:center;margin-bottom:15px;">
                                     <span style="font-size:2em;font-weight:bold;color:#667eea;">€0,99</span>
                                     <span style="color:#888;font-size:0.9em;"> una tantum</span>
                                 </div>
                                 <button onclick="PremiumManager.purchase()" style="width:100%;padding:15px;background:linear-gradient(135deg,#667eea,#764ba2);color:white;border:none;border-radius:12px;font-size:1em;font-weight:600;cursor:pointer;margin-bottom:10px;">
-                                    💎 Passa a PRO
+                                    💎 Passa a PRO - €0,99
                                 </button>
                                 <button onclick="document.getElementById('premiumModal').remove()" style="width:100%;padding:12px;background:#f0f0f0;color:#666;border:none;border-radius:10px;font-size:0.9em;cursor:pointer;">
-                                    Continua gratis con pubblicità
+                                    Torno domani 😊
                                 </button>
                             </div>
                         </div>
@@ -1500,14 +1574,11 @@ Per revocare il consenso: Impostazioni → Cancella tutti i dati`);
                 document.body.appendChild(modal);
             },
             
-            // Handle purchase (placeholder - requires Play Store billing integration)
+            // Handle purchase
             purchase() {
-                // Per ora mostriamo un messaggio
-                // L'acquisto vero richiede Google Play Billing API
-                alert('🚧 Acquisti in-app disponibili prossimamente!\\n\\nPer ora goditi l\\'app gratis con pubblicità.');
+                alert('🚧 Acquisti in-app disponibili prossimamente!\\n\\nPer ora goditi l\\'app gratis con il limite giornaliero.');
                 document.getElementById('premiumModal')?.remove();
-                
-                // TODO: Integrare Google Play Billing quando l'app è sul Play Store
+                // TODO: Integrare Google Play Billing
                 // https://developer.android.com/google/play/billing
             }
         };
