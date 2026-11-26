@@ -1053,9 +1053,12 @@ Per revocare il consenso: Impostazioni → Cancella tutti i dati`);
                 const remaining = PremiumManager.getRemainingUses('itinerary');
                 const premiumBadge = PremiumManager.isPremium() ? ' 💎' : ` <small style="color:#888;">(${remaining} rimasto oggi)</small>`;
                 
-                response = '🗓️ <b>Ecco il tuo itinerario perfetto per oggi!</b>' + premiumBadge + '<br>Percorso ottimizzato per non perdere tempo:';
+                response = currentLang === 'en' 
+                    ? '🗓️ <b>Here\'s your perfect itinerary for today!</b>' + premiumBadge + '<br>Optimized route so you don\'t waste time:'
+                    : '🗓️ <b>Ecco il tuo itinerario perfetto per oggi!</b>' + premiumBadge + '<br>Percorso ottimizzato per non perdere tempo:';
                 const itinerary = generateItinerary(userLocation);
                 let totalCost = 0, totalTime = 0;
+                const freeText = currentLang === 'en' ? 'Free' : 'Gratis';
                 itinerary.forEach((p, i) => {
                     totalCost += p.cost;
                     totalTime += p.duration;
@@ -1064,13 +1067,15 @@ Per revocare il consenso: Impostazioni → Cancella tutti i dati`);
                         <span class="emoji">${timeEmoji} ${i+1}.</span>
                         <div class="info">
                             <div class="name">${p.emoji} ${sanitizeInput(p.name)}</div>
-                            <div class="meta">${formatDuration(p.duration)} • ${p.cost === 0 ? 'Gratis' : '$' + p.cost}</div>
+                            <div class="meta">${formatDuration(p.duration)} • ${p.cost === 0 ? freeText : '$' + p.cost}</div>
                         </div>
                         <button class="go-btn" onclick="event.stopPropagation();openNav(${p.lat},${p.lng},'${sanitizeInput(p.name).replace(/'/g,"\\'")}')">📍</button>
                     </div>`;
                 });
+                const allFreeText = currentLang === 'en' ? 'All free!' : 'Tutto gratis!';
+                const totalText = currentLang === 'en' ? 'Total' : 'Totale';
                 response += `<div style="background:#e8f5e9;padding:10px;border-radius:8px;margin-top:10px;font-size:0.85em;">
-                    📊 <b>Totale:</b> ${formatDuration(totalTime)} • ${totalCost === 0 ? 'Tutto gratis!' : '$' + totalCost}
+                    📊 <b>${totalText}:</b> ${formatDuration(totalTime)} • ${totalCost === 0 ? allFreeText : '$' + totalCost}
                 </div>`;
                 return response;
             }
@@ -1082,14 +1087,15 @@ Per revocare il consenso: Impostazioni → Cancella tutti i dati`);
                 suggestions = places.filter(p => p.cost <= budget && p.cost > 0).sort((a,b) => b.importance - a.importance).slice(0, 6);
                 if (suggestions.length === 0) {
                     suggestions = places.filter(p => p.cost === 0).sort((a,b) => b.importance - a.importance).slice(0, 6);
-                    response = `💰 Con $${budget}? Ecco cose GRATIS super fighe:`;
+                    response = currentLang === 'en' ? `💰 With $${budget}? Here are FREE amazing things:` : `💰 Con $${budget}? Ecco cose GRATIS super fighe:`;
                 }
             }
             // 3. COSA È APERTO ADESSO
             else if (matchKeyword('openNow')) {
                 const now = new Date();
                 const hour = now.getHours();
-                response = `🕐 <b>Aperto adesso</b> (sono le ${hour}:${String(now.getMinutes()).padStart(2,'0')}):`;
+                const timeStr = `${hour}:${String(now.getMinutes()).padStart(2,'0')}`;
+                response = currentLang === 'en' ? `🕐 <b>Open now</b> (it's ${timeStr}):` : `🕐 <b>Aperto adesso</b> (sono le ${timeStr}):`;
                 let openPlaces = places.filter(p => isOpenNow(p.hours));
                 if (userLocation) {
                     openPlaces.sort((a,b) => getDistance(userLocation.lat, userLocation.lng, a.lat, a.lng) - getDistance(userLocation.lat, userLocation.lng, b.lat, b.lng));
@@ -1297,18 +1303,22 @@ Per revocare il consenso: Impostazioni → Cancella tutti i dati`);
                     response = '⭐ <b>Luoghi iconici di NYC!</b> I posti che DEVI vedere:';
                     suggestions = places.filter(p => p.category === 'iconic').sort((a,b) => b.importance - a.importance).slice(0, 6);
                 } else if (matchKeyword('newjersey')) {
-                    response = '🌉 <b>New Jersey!</b> Dall\'altra parte del fiume con vista su Manhattan:';
+                    response = currentLang === 'en' ? '🌉 <b>New Jersey!</b> Across the river with Manhattan views:' : '🌉 <b>New Jersey!</b> Dall\'altra parte del fiume con vista su Manhattan:';
                     suggestions = places.filter(p => p.category === 'newjersey').sort((a,b) => b.importance - a.importance).slice(0, 6);
                 } else {
                     // NON CAPITO - Mostra suggerimenti intelligenti
                     response = t('chat.notUnderstood');
+                    const todayBtn = currentLang === 'en' ? 'What to do today?' : 'Cosa faccio oggi?';
+                    const randomBtn = currentLang === 'en' ? 'Surprise me' : 'Sorprendimi';
+                    const openNowBtn = currentLang === 'en' ? "What's open?" : 'Cosa è aperto?';
+                    const freeBtn = currentLang === 'en' ? 'Free' : 'Gratis';
                     return response + `<div class="quick-actions" style="flex-wrap:wrap;">
-                        <button class="quick-btn" onclick="sendQuickMessage('Cosa faccio oggi?')">🗓️ Oggi</button>
+                        <button class="quick-btn" onclick="sendQuickMessage('${todayBtn}')">🗓️ ${currentLang === 'en' ? 'Today' : 'Oggi'}</button>
                         <button class="quick-btn" onclick="sendQuickMessage('Top 10')">🏆 Top 10</button>
-                        <button class="quick-btn" onclick="sendQuickMessage('Sorprendimi')">🎲 Random</button>
-                        <button class="quick-btn" onclick="sendQuickMessage('Cosa è aperto?')">🕐 Aperto ora</button>
+                        <button class="quick-btn" onclick="sendQuickMessage('${randomBtn}')">🎲 Random</button>
+                        <button class="quick-btn" onclick="sendQuickMessage('${openNowBtn}')">🕐 ${currentLang === 'en' ? 'Open now' : 'Aperto ora'}</button>
                         <button class="quick-btn" onclick="sendQuickMessage('${sanitizeInput(t('quickActions.pizza'))}')">🍕 Pizza</button>
-                        <button class="quick-btn" onclick="sendQuickMessage('${sanitizeInput(t('quickActions.free'))}')">🎉 Gratis</button>
+                        <button class="quick-btn" onclick="sendQuickMessage('${sanitizeInput(t('quickActions.free'))}')">🎉 ${freeBtn}</button>
                         <button class="quick-btn" onclick="sendQuickMessage('Film locations')">🎬 Film</button>
                         <button class="quick-btn" onclick="sendQuickMessage('${sanitizeInput(t('quickActions.insta'))}')">📸 Insta</button>
                     </div>`;
@@ -1320,14 +1330,16 @@ Per revocare il consenso: Impostazioni → Cancella tutti i dati`);
                 const dist = userLocation ? formatDistance(getDistance(userLocation.lat, userLocation.lng, p.lat, p.lng)) : '';
                 const costText = p.cost === 0 ? t('units.free') : '$' + p.cost;
                 const isOpen = isOpenNow(p.hours);
-                const openBadge = isOpen ? '<span style="color:#2ecc71;font-size:0.7em;">● Aperto</span>' : '<span style="color:#e74c3c;font-size:0.7em;">● Chiuso</span>';
+                const openText = currentLang === 'en' ? 'Open' : currentLang === 'es' ? 'Abierto' : currentLang === 'fr' ? 'Ouvert' : currentLang === 'de' ? 'Offen' : 'Aperto';
+                const closedText = currentLang === 'en' ? 'Closed' : currentLang === 'es' ? 'Cerrado' : currentLang === 'fr' ? 'Fermé' : currentLang === 'de' ? 'Geschlossen' : 'Chiuso';
+                const openBadge = isOpen ? `<span style="color:#2ecc71;font-size:0.7em;">● ${openText}</span>` : `<span style="color:#e74c3c;font-size:0.7em;">● ${closedText}</span>`;
                 response += `<div class="place-suggestion" onclick="focusPlace(${p.id})">
                     <span class="emoji">${p.emoji}</span>
                     <div class="info">
                         <div class="name">${sanitizeInput(p.name)} ${openBadge}</div>
                         <div class="meta">${dist?dist+' • ':''}${formatDuration(p.duration)} • ${costText}</div>
                     </div>
-                    <button class="go-btn" onclick="event.stopPropagation();openNav(${p.lat},${p.lng},'${sanitizeInput(p.name).replace(/'/g,"\\'")}')">Vai</button>
+                    <button class="go-btn" onclick="event.stopPropagation();openNav(${p.lat},${p.lng},'${sanitizeInput(p.name).replace(/'/g,"\\'")}')">Go</button>
                 </div>`;
             });
             return response;
