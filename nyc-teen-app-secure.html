@@ -154,10 +154,16 @@
         .quick-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
         .quick-btn { background: white; border: 1px solid var(--primary); color: var(--primary); padding: 5px 10px; border-radius: 15px; font-size: 0.75em; cursor: pointer; }
         .quick-btn:hover { background: var(--primary); color: white; }
-        .chat-input-area { display: flex; gap: 10px; padding: 10px 15px; border-top: 1px solid #eee; background: white; padding-bottom: calc(10px + var(--safe-bottom)); }
+        .chat-input-area { display: flex; gap: 10px; padding: 10px 15px; border-top: 1px solid #eee; background: white; padding-bottom: calc(10px + var(--safe-bottom)); position: relative; }
         .chat-input { flex: 1; border: 1px solid #ddd; border-radius: 20px; padding: 10px 15px; font-family: inherit; font-size: 0.9em; outline: none; }
         .chat-input:focus { border-color: var(--primary); }
         .chat-send { background: var(--primary); color: white; border: none; width: 45px; height: 45px; border-radius: 50%; font-size: 1.2em; cursor: pointer; }
+        .autocomplete-suggestions { position: absolute; bottom: 100%; left: 15px; right: 60px; background: white; border: 1px solid #ddd; border-radius: 12px; box-shadow: 0 -4px 15px rgba(0,0,0,0.1); max-height: 200px; overflow-y: auto; display: none; z-index: 100; }
+        .autocomplete-suggestions.show { display: block; }
+        .autocomplete-item { padding: 10px 15px; cursor: pointer; font-size: 0.85em; border-bottom: 1px solid #f0f0f0; display: flex; align-items: center; gap: 10px; }
+        .autocomplete-item:last-child { border-bottom: none; }
+        .autocomplete-item:hover, .autocomplete-item.selected { background: #f0f0f0; }
+        .autocomplete-item .icon { font-size: 1.2em; }
         .leaflet-popup-content-wrapper { border-radius: 12px; padding: 0; }
         .leaflet-popup-content { margin: 0; min-width: 220px; }
         .popup-content { padding: 12px; }
@@ -426,7 +432,8 @@
             </div>
             <div class="chat-messages" id="chatMessages"></div>
             <div class="chat-input-area">
-                <input type="text" class="chat-input" id="chatInput" placeholder="Scrivi qui..." onkeypress="if(event.key==='Enter')sendMessage()" autocomplete="off" maxlength="200">
+                <div class="autocomplete-suggestions" id="autocompleteSuggestions"></div>
+                <input type="text" class="chat-input" id="chatInput" placeholder="Ask me anything..." oninput="showAutocompleteSuggestions()" onkeydown="handleAutocompleteKey(event)" onfocus="showAutocompleteSuggestions()" autocomplete="off" maxlength="200">
                 <button class="chat-send" onclick="sendMessage()">➤</button>
             </div>
         </div>
@@ -917,8 +924,135 @@ Per revocare il consenso: Impostazioni → Cancella tutti i dati`);
                 chat.classList.add('open');
             }
             document.getElementById('chatInput').value = msg;
+            hideAutocompleteSuggestions();
             sendMessage();
         }
+        
+        // Autocomplete suggestions data
+        const autocompletePhrases = [
+            { icon: '⚡', text: 'Harry Potter spots', category: 'harrypotter' },
+            { icon: '🗓️', text: 'What should I do today?', category: 'itinerary' },
+            { icon: '🍕', text: 'Best pizza in NYC', category: 'food' },
+            { icon: '🍔', text: 'Where to eat burgers?', category: 'food' },
+            { icon: '🍦', text: 'Best ice cream', category: 'food' },
+            { icon: '🥯', text: 'Famous bagels', category: 'food' },
+            { icon: '📸', text: 'Instagram photo spots', category: 'insta' },
+            { icon: '🆓', text: 'Free things to do', category: 'free' },
+            { icon: '📍', text: 'What\'s nearby?', category: 'nearby' },
+            { icon: '🎬', text: 'Movie filming locations', category: 'movies' },
+            { icon: '🎲', text: 'Surprise me!', category: 'random' },
+            { icon: '🏛️', text: 'Best museums', category: 'museums' },
+            { icon: '🛍️', text: 'Shopping spots', category: 'shopping' },
+            { icon: '🌧️', text: 'Indoor activities (rainy day)', category: 'rain' },
+            { icon: '🗽', text: 'Statue of Liberty', category: 'attractions' },
+            { icon: '🌉', text: 'Brooklyn Bridge', category: 'attractions' },
+            { icon: '🏙️', text: 'Times Square', category: 'attractions' },
+            { icon: '🌳', text: 'Central Park', category: 'attractions' },
+            { icon: '🎭', text: 'Broadway shows', category: 'attractions' },
+            { icon: '🏀', text: 'NBA Store', category: 'shopping' },
+            { icon: '🎮', text: 'Nintendo Store', category: 'shopping' },
+            { icon: '📚', text: 'Bookstores', category: 'shopping' },
+            { icon: '🌃', text: 'Best views of NYC', category: 'insta' },
+            { icon: '☕', text: 'Friends apartment', category: 'movies' },
+            { icon: '🕷️', text: 'Spider-Man locations', category: 'movies' },
+            { icon: '🏠', text: 'Home Alone 2 spots', category: 'movies' },
+            { icon: '🚇', text: 'SoHo neighborhood', category: 'area' },
+            { icon: '🌉', text: 'Brooklyn DUMBO', category: 'area' },
+            { icon: '🏮', text: 'Chinatown food', category: 'area' },
+            { icon: '💵', text: 'Cheap eats under $15', category: 'budget' }
+        ];
+        
+        let selectedAutocompleteIndex = -1;
+        
+        function showAutocompleteSuggestions() {
+            const input = document.getElementById('chatInput');
+            const container = document.getElementById('autocompleteSuggestions');
+            const query = input.value.toLowerCase().trim();
+            
+            // Filter suggestions based on input
+            let filtered;
+            if (query.length === 0) {
+                // Show popular suggestions when empty
+                filtered = autocompletePhrases.slice(0, 8);
+            } else {
+                filtered = autocompletePhrases.filter(p => 
+                    p.text.toLowerCase().includes(query) || 
+                    p.category.includes(query)
+                ).slice(0, 6);
+            }
+            
+            if (filtered.length === 0) {
+                hideAutocompleteSuggestions();
+                return;
+            }
+            
+            container.innerHTML = filtered.map((p, i) => `
+                <div class="autocomplete-item ${i === selectedAutocompleteIndex ? 'selected' : ''}" 
+                     onclick="selectAutocomplete('${p.text.replace(/'/g, "\\'")}')">
+                    <span class="icon">${p.icon}</span>
+                    <span>${p.text}</span>
+                </div>
+            `).join('');
+            
+            container.classList.add('show');
+            selectedAutocompleteIndex = -1;
+        }
+        
+        function hideAutocompleteSuggestions() {
+            document.getElementById('autocompleteSuggestions').classList.remove('show');
+            selectedAutocompleteIndex = -1;
+        }
+        
+        function selectAutocomplete(text) {
+            document.getElementById('chatInput').value = text;
+            hideAutocompleteSuggestions();
+            sendMessage();
+        }
+        
+        function handleAutocompleteKey(event) {
+            const container = document.getElementById('autocompleteSuggestions');
+            const items = container.querySelectorAll('.autocomplete-item');
+            
+            if (!container.classList.contains('show') || items.length === 0) {
+                if (event.key === 'Enter') {
+                    sendMessage();
+                }
+                return;
+            }
+            
+            if (event.key === 'ArrowDown') {
+                event.preventDefault();
+                selectedAutocompleteIndex = Math.min(selectedAutocompleteIndex + 1, items.length - 1);
+                updateAutocompleteSelection(items);
+            } else if (event.key === 'ArrowUp') {
+                event.preventDefault();
+                selectedAutocompleteIndex = Math.max(selectedAutocompleteIndex - 1, -1);
+                updateAutocompleteSelection(items);
+            } else if (event.key === 'Enter') {
+                event.preventDefault();
+                if (selectedAutocompleteIndex >= 0 && items[selectedAutocompleteIndex]) {
+                    items[selectedAutocompleteIndex].click();
+                } else {
+                    hideAutocompleteSuggestions();
+                    sendMessage();
+                }
+            } else if (event.key === 'Escape') {
+                hideAutocompleteSuggestions();
+            }
+        }
+        
+        function updateAutocompleteSelection(items) {
+            items.forEach((item, i) => {
+                item.classList.toggle('selected', i === selectedAutocompleteIndex);
+            });
+        }
+        
+        // Hide autocomplete when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.chat-input-area')) {
+                hideAutocompleteSuggestions();
+            }
+        });
 
         function sendMessage() {
             const input = document.getElementById('chatInput');
