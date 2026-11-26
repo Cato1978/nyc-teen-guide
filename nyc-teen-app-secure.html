@@ -111,8 +111,7 @@
         .lang-option:last-child { border-bottom: none; }
         .lang-option:hover { background: #f0f0f0; }
         .lang-option.active { background: var(--primary); color: white; }
-        .filter-chips { display: flex; gap: 6px; padding: 8px 12px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; border-top: 1px solid #eee; }
-        .filter-chips::-webkit-scrollbar { display: none; }
+        .filter-chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 12px; border-top: 1px solid #eee; }
         .filter-chip { flex-shrink: 0; padding: 6px 12px; border-radius: 15px; background: #f0f0f0; font-size: 0.75em; font-weight: 600; cursor: pointer; transition: all 0.3s; }
         .filter-chip.active { background: var(--primary); color: white; }
         .filter-chip[data-cat="attractions"].active { background: var(--attractions); }
@@ -358,14 +357,14 @@
                 <button class="search-btn settings-btn" onclick="toggleSettings()" title="Settings">⚙️</button>
             </div>
             <div class="filter-chips" id="filterChips">
-                <div class="filter-chip active" data-cat="all" onclick="toggleFilter('all')">🗽 <span data-i18n="filters.all">Tutti</span></div>
-                <div class="filter-chip" data-cat="attractions" onclick="toggleFilter('attractions')">🎢 <span data-i18n="filters.attractions">Attrazioni</span></div>
-                <div class="filter-chip" data-cat="museums" onclick="toggleFilter('museums')">🏛️ <span data-i18n="filters.museums">Musei</span></div>
-                <div class="filter-chip" data-cat="harrypotter" onclick="toggleFilter('harrypotter')">⚡ <span data-i18n="filters.harrypotter">HP</span></div>
-                <div class="filter-chip" data-cat="food" onclick="toggleFilter('food')">🍕 <span data-i18n="filters.food">Cibo</span></div>
+                <div class="filter-chip active" data-cat="all" onclick="toggleFilter('all')">🗽 <span data-i18n="filters.all">All</span></div>
+                <div class="filter-chip" data-cat="attractions" onclick="toggleFilter('attractions')">🎢 <span data-i18n="filters.attractions">Attractions</span></div>
+                <div class="filter-chip" data-cat="museums" onclick="toggleFilter('museums')">🏛️ <span data-i18n="filters.museums">Museums</span></div>
+                <div class="filter-chip" data-cat="harrypotter" onclick="toggleFilter('harrypotter')">⚡ <span data-i18n="filters.harrypotter">Harry Potter</span></div>
+                <div class="filter-chip" data-cat="food" onclick="toggleFilter('food')">🍕 <span data-i18n="filters.food">Food</span></div>
                 <div class="filter-chip" data-cat="shopping" onclick="toggleFilter('shopping')">🛍️ <span data-i18n="filters.shopping">Shop</span></div>
-                <div class="filter-chip" data-cat="movies" onclick="toggleFilter('movies')">🎬 <span data-i18n="filters.movies">Film</span></div>
-                <div class="filter-chip" data-cat="iconic" onclick="toggleFilter('iconic')">⭐ <span data-i18n="filters.iconic">Iconici</span></div>
+                <div class="filter-chip" data-cat="movies" onclick="toggleFilter('movies')">🎬 <span data-i18n="filters.movies">Movies</span></div>
+                <div class="filter-chip" data-cat="iconic" onclick="toggleFilter('iconic')">⭐ <span data-i18n="filters.iconic">Iconic</span></div>
                 <div class="filter-chip" data-cat="newjersey" onclick="toggleFilter('newjersey')">🌉 <span data-i18n="filters.newjersey">NJ</span></div>
             </div>
             <div class="time-filter">
