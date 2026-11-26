@@ -671,16 +671,12 @@ Per revocare il consenso: Impostazioni → Cancella tutti i dati`);
         document.addEventListener('DOMContentLoaded', async () => {
             await loadTranslations();
             
-            // Check saved language
+            // Check saved language only - default is English
             const savedLang = localStorage.getItem('nycGuide_lang');
             if (savedLang && availableLangs.includes(savedLang)) {
                 currentLang = savedLang;
-            } else {
-                const browserLang = navigator.language.slice(0, 2);
-                if (availableLangs.includes(browserLang)) {
-                    currentLang = browserLang;
-                }
             }
+            // If no saved language, keep default (English)
             
             // Show privacy modal if no consent
             if (!PrivacyManager.hasConsent()) {
