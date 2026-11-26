@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NYC Teen Guide - Guida Tester</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Poppins', sans-serif; background: #f5f6fa; color: #333; line-height: 1.6; }
+        .header { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 40px 20px; text-align: center; }
+        .header h1 { font-size: 2em; margin-bottom: 10px; }
+        .header p { opacity: 0.9; }
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        .section { background: white; border-radius: 15px; padding: 25px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .section h2 { color: #667eea; font-size: 1.3em; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        .section h3 { color: #333; font-size: 1.1em; margin: 20px 0 10px 0; }
+        .section p, .section li { color: #555; margin-bottom: 10px; }
+        .section ul, .section ol { padding-left: 25px; }
+        .section li { margin-bottom: 8px; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f8f9fa; color: #667eea; }
+        .tip { background: #e8f5e9; border-left: 4px solid #4caf50; padding: 15px; border-radius: 0 10px 10px 0; margin: 15px 0; }
+        .warning { background: #fff3e0; border-left: 4px solid #ff9800; padding: 15px; border-radius: 0 10px 10px 0; margin: 15px 0; }
+        .quick-btn { display: inline-block; padding: 8px 15px; background: #f0f0f0; border-radius: 20px; margin: 5px; font-size: 0.9em; }
+        .checklist { background: #f8f9fa; padding: 20px; border-radius: 10px; }
+        .checklist label { display: flex; align-items: center; gap: 10px; padding: 8px 0; cursor: pointer; }
+        .checklist input[type="checkbox"] { width: 20px; height: 20px; }
+        .footer { text-align: center; padding: 30px; color: #888; }
+        .color-dot { display: inline-block; width: 15px; height: 15px; border-radius: 50%; margin-right: 8px; }
+        @media (max-width: 600px) {
+            .header h1 { font-size: 1.5em; }
+            .section { padding: 20px 15px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🗽 NYC Teen Guide</h1>
+        <p>Guida per i Tester</p>
+    </div>
+    
+    <div class="container">
+        <div class="section">
+            <h2>📱 Come installare l'app</h2>
+            <ol>
+                <li>Clicca il link che ti abbiamo inviato</li>
+                <li>Accetta di diventare tester</li>
+                <li>Scarica l'app dal Play Store</li>
+                <li>Aprila e clicca <strong>"Got it, let's go!"</strong></li>
+            </ol>
+        </div>
+        
+        <div class="section">
+            <h2>🗺️ Come usare la mappa</h2>
+            
+            <h3>Navigare</h3>
+            <ul>
+                <li><strong>Trascina</strong> per muoverti sulla mappa</li>
+                <li><strong>Pizzica</strong> per zoomare</li>
+                <li>I <strong>pallini colorati</strong> sono i luoghi</li>
+            </ul>
+            
+            <h3>Colori dei marker</h3>
+            <table>
+                <tr><th>Colore</th><th>Categoria</th></tr>
+                <tr><td><span class="color-dot" style="background:#FF6B6B"></span>Rosso</td><td>Attrazioni</td></tr>
+                <tr><td><span class="color-dot" style="background:#3498DB"></span>Blu</td><td>Musei</td></tr>
+                <tr><td><span class="color-dot" style="background:#9B59B6"></span>Viola</td><td>Harry Potter</td></tr>
+                <tr><td><span class="color-dot" style="background:#F39C12"></span>Arancione</td><td>Cibo</td></tr>
+                <tr><td><span class="color-dot" style="background:#1ABC9C"></span>Verde</td><td>Shopping</td></tr>
+                <tr><td><span class="color-dot" style="background:#E91E63"></span>Rosa</td><td>Location film</td></tr>
+                <tr><td><span class="color-dot" style="background:#FF5722"></span>Marrone</td><td>Luoghi iconici</td></tr>
+                <tr><td><span class="color-dot" style="background:#00BCD4"></span>Azzurro</td><td>New Jersey</td></tr>
+            </table>
+            
+            <h3>Cliccare su un luogo</h3>
+            <p>Tocca un marker per vedere nome, descrizione, orari, costo, distanza e il pulsante <strong>"Navigate"</strong> per le indicazioni.</p>
+        </div>
+        
+        <div class="section">
+            <h2>🔍 Come filtrare i luoghi</h2>
+            <p>Sotto la barra di ricerca trovi i <strong>filtri</strong>:</p>
+            <ul>
+                <li><strong>All</strong> - Mostra tutti i 300+ luoghi</li>
+                <li><strong>Attractions</strong> - Empire State, Statua Libertà, ecc.</li>
+                <li><strong>Museums</strong> - MoMA, Met, Museo di Storia Naturale</li>
+                <li><strong>Harry Potter</strong> - Negozio HP, Butterbeer, Cursed Child</li>
+                <li><strong>Food</strong> - Pizza, bagel, gelato, ristoranti</li>
+                <li><strong>Shopping</strong> - Nintendo, Nike, negozi cool</li>
+                <li><strong>Movies</strong> - Dove hanno girato i film famosi</li>
+                <li><strong>Iconic</strong> - Luoghi simbolo di NYC</li>
+            </ul>
+            <div class="tip">💡 Tocca un filtro per attivarlo. Tocca di nuovo per disattivarlo.</div>
+        </div>
+        
+        <div class="section">
+            <h2>🤖 Come usare il Chatbot</h2>
+            <p>Il chatbot è il tuo assistente personale! Tocca la barra viola in basso per aprirlo.</p>
+            
+            <h3>Pulsanti rapidi</h3>
+            <p>Trovi 8 pulsanti per domande veloci:</p>
+            <div style="margin: 15px 0;">
+                <span class="quick-btn">⚡ Harry Potter</span>
+                <span class="quick-btn">🗓️ Today</span>
+                <span class="quick-btn">🍕 Pizza</span>
+                <span class="quick-btn">📸 Insta</span>
+                <span class="quick-btn">🆓 Free</span>
+                <span class="quick-btn">📍 Nearby</span>
+                <span class="quick-btn">🎬 Movies</span>
+                <span class="quick-btn">🎲 Random</span>
+            </div>
+            
+            <h3>Puoi anche scrivere</h3>
+            <p>Esempi di domande:</p>
+            <ul>
+                <li>"Dove trovo Harry Potter?"</li>
+                <li>"Pizza buona?"</li>
+                <li>"Cosa faccio oggi?"</li>
+                <li>"Posti gratis"</li>
+                <li>"Times Square"</li>
+                <li>"Cosa c'è a Brooklyn?"</li>
+                <li>"Piove, dove vado?"</li>
+            </ul>
+        </div>
+        
+        <div class="section">
+            <h2>📍 GPS e navigazione</h2>
+            
+            <h3>Attivare il GPS</h3>
+            <ol>
+                <li>Tocca il pulsante <strong>verde 📍</strong> in alto</li>
+                <li>Accetta il permesso di localizzazione</li>
+                <li>Vedrai un <strong>cerchio blu</strong> sulla mappa = sei tu!</li>
+            </ol>
+            
+            <h3>Navigare verso un luogo</h3>
+            <ol>
+                <li>Tocca un marker sulla mappa</li>
+                <li>Nel popup, clicca <strong>"Navigate"</strong> o <strong>"📍 Go"</strong></li>
+                <li>Si apre Google Maps con le indicazioni</li>
+            </ol>
+        </div>
+        
+        <div class="section">
+            <h2>🌍 Cambiare lingua</h2>
+            <ol>
+                <li>Tocca il pulsante <strong>"EN"</strong> in alto a destra</li>
+                <li>Scegli tra: ��🇧 English, 🇮🇹 Italiano, 🇪🇸 Español, 🇫🇷 Français, 🇩🇪 Deutsch</li>
+            </ol>
+        </div>
+        
+        <div class="section">
+            <h2>❓ Problemi comuni</h2>
+            
+            <div class="warning">
+                <strong>L'app non carica?</strong><br>
+                Controlla la connessione internet e prova a ricaricare.
+            </div>
+            
+            <div class="warning">
+                <strong>GPS non funziona?</strong><br>
+                Vai nelle impostazioni del telefono e abilita la posizione per l'app.
+            </div>
+            
+            <div class="warning">
+                <strong>Mappa bianca?</strong><br>
+                Aspetta qualche secondo, la mappa si scarica da internet.
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>📝 Checklist del Tester</h2>
+            <p>Per favore prova queste funzioni e dicci se funzionano:</p>
+            
+            <div class="checklist">
+                <label><input type="checkbox"> Aprire l'app</label>
+                <label><input type="checkbox"> Navigare sulla mappa</label>
+                <label><input type="checkbox"> Cliccare sui marker</label>
+                <label><input type="checkbox"> Usare i filtri</label>
+                <label><input type="checkbox"> Aprire il chatbot</label>
+                <label><input type="checkbox"> Usare i pulsanti rapidi</label>
+                <label><input type="checkbox"> Scrivere una domanda al chatbot</label>
+                <label><input type="checkbox"> Cambiare lingua</label>
+                <label><input type="checkbox"> Attivare il GPS</label>
+                <label><input type="checkbox"> Navigare verso un luogo</label>
+            </div>
+            
+            <div class="tip" style="margin-top: 20px;">
+                📧 Se trovi bug o problemi, fai uno screenshot e invialo a: <strong>support@nycteenguide.app</strong>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>🙏 Grazie per il tuo aiuto!</p>
+        <p>Il tuo feedback ci aiuta a migliorare l'app prima del lancio ufficiale.</p>
+        <p><strong>Buon test e buon viaggio virtuale a New York! 🗽✨</strong></p>
+    </div>
+</body>
+</html>
