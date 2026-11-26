@@ -138,6 +138,9 @@
         .chat-container.open .chat-toggle { transform: rotate(180deg); }
         .chat-body { background: white; height: 350px; display: flex; flex-direction: column; }
         .chat-messages { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .quick-actions { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 12px; border-bottom: 1px solid #eee; background: #f8f9fa; }
+        .quick-btn { padding: 6px 12px; border-radius: 15px; background: white; border: 1px solid #ddd; font-size: 0.75em; cursor: pointer; transition: all 0.2s; }
+        .quick-btn:hover { background: var(--primary); color: white; border-color: var(--primary); }
         .message { max-width: 85%; padding: 10px 14px; border-radius: 15px; font-size: 0.9em; line-height: 1.4; }
         .message.bot { background: #f0f0f0; align-self: flex-start; border-bottom-left-radius: 5px; }
         .message.user { background: var(--primary); color: white; align-self: flex-end; border-bottom-right-radius: 5px; }
@@ -411,6 +414,16 @@
             <div class="chat-toggle">▲</div>
         </div>
         <div class="chat-body">
+            <div class="quick-actions" id="quickActions">
+                <button class="quick-btn" onclick="quickAsk('⚡ Harry Potter')">⚡ Harry Potter</button>
+                <button class="quick-btn" onclick="quickAsk('🗓️ Today\'s plan')">🗓️ Today</button>
+                <button class="quick-btn" onclick="quickAsk('🍕 Pizza')">🍕 Pizza</button>
+                <button class="quick-btn" onclick="quickAsk('📸 Instagram spots')">📸 Insta</button>
+                <button class="quick-btn" onclick="quickAsk('🆓 Free stuff')">🆓 Free</button>
+                <button class="quick-btn" onclick="quickAsk('📍 Nearby')">📍 Nearby</button>
+                <button class="quick-btn" onclick="quickAsk('🎬 Movies')">🎬 Movies</button>
+                <button class="quick-btn" onclick="quickAsk('🎲 Surprise me')">🎲 Random</button>
+            </div>
             <div class="chat-messages" id="chatMessages"></div>
             <div class="chat-input-area">
                 <input type="text" class="chat-input" id="chatInput" placeholder="Scrivi qui..." onkeypress="if(event.key==='Enter')sendMessage()" autocomplete="off" maxlength="200">
@@ -896,6 +909,16 @@ Per revocare il consenso: Impostazioni → Cancella tutti i dati`);
 
         function toggleChat() { document.getElementById('chatContainer').classList.toggle('open'); }
         function sendQuickMessage(msg) { document.getElementById('chatInput').value = msg; sendMessage(); }
+        
+        function quickAsk(msg) {
+            // Open chat if closed
+            const chat = document.getElementById('chatContainer');
+            if (!chat.classList.contains('open')) {
+                chat.classList.add('open');
+            }
+            document.getElementById('chatInput').value = msg;
+            sendMessage();
+        }
 
         function sendMessage() {
             const input = document.getElementById('chatInput');
