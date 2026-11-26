@@ -1,0 +1,32 @@
+# Node modules
+node_modules/
+
+# Generati (non servono su GitHub)
+genera-icone.js
+genera-screenshots.js
+
+# File di sviluppo
+*.tar
+.vscode/
+
+# SVG sorgenti (teniamo solo i PNG finali)
+icons/*.svg
+icons/*.html
+screenshots/*.svg
+
+# File non necessari per l'app
+DOCUMENTAZIONE-NYC-TEEN-GUIDE.md
+NYC-Teen-Guide-Documentazione.html
+GUIDA-UTENTE-NYC.md
+GUIDA-UTENTE-NYC.html
+PLAY-STORE-LISTING.md
+PUBBLICAZIONE-CHECKLIST.md
+nyc-functions.js
+nyc-functions.test.js
+nyc-mutation-test.js
+nyc-teen-app.html
+nyc-teen-app-i18n.html
+nyc-teen-vacation.html
+
+# GarminLibre (progetto separato)
+GarminLibre/

@@ -1,0 +1,100 @@
+{
+  "meta": {
+    "code": "es",
+    "name": "Español",
+    "flag": "🇪🇸"
+  },
+  "app": {
+    "title": "NYC Teen Guide 🗽",
+    "loading": "Cargando 500 lugares...",
+    "places": "lugares"
+  },
+  "search": {
+    "placeholder": "Buscar dirección o zona...",
+    "gpsTitle": "Ubicación GPS",
+    "searchTitle": "Buscar"
+  },
+  "filters": {
+    "all": "Todos",
+    "attractions": "Atracciones",
+    "museums": "Museos",
+    "harrypotter": "HP",
+    "food": "Comida",
+    "shopping": "Tiendas",
+    "movies": "Películas",
+    "iconic": "Icónicos",
+    "newjersey": "NJ"
+  },
+  "time": {
+    "label": "Tengo:",
+    "allTime": "Todo el tiempo",
+    "30min": "30 minutos",
+    "1hour": "1 hora",
+    "2hours": "2 horas",
+    "halfDay": "Medio día"
+  },
+  "buttons": {
+    "center": "Centrar",
+    "assistant": "Asistente"
+  },
+  "chat": {
+    "title": "Guía NYC",
+    "subtitle": "500 lugares • Itinerarios • Budget",
+    "welcome": "¡Hola! 👋 Soy tu guía de NYC con <b>500 lugares</b>! 🗽<br><br>Puedo crear itinerarios, filtrar por presupuesto, encontrar lugares abiertos... ¡Pregúntame!",
+    "inputPlaceholder": "Escribe aquí...",
+    "notUnderstood": "No entendí bien 🤔 Prueba:"
+  },
+  "quickActions": {
+    "hungry": "Tengo hambre",
+    "nearby": "Cerca",
+    "shopping": "Compras",
+    "insta": "Insta",
+    "hp": "HP",
+    "free": "Gratis",
+    "sweets": "Dulces",
+    "pizza": "Pizza"
+  },
+  "popup": {
+    "free": "GRATIS",
+    "review": "Reseña",
+    "proTip": "Consejo",
+    "bestTime": "Mejor hora",
+    "mustDo": "Imperdible",
+    "order": "Pedir",
+    "takeMe": "¡Llévame!",
+    "youAreHere": "¡Estás aquí!"
+  },
+  "responses": {
+    "pizza": "🍕 Las mejores pizzerías de NYC:",
+    "hungry": "¿Tienes hambre? 🍽️ Los mejores:",
+    "sweets": "🍪🍦 Dulces INCREÍBLES en NYC:",
+    "shopping": "🛍️ Tiendas para teens:",
+    "harryPotter": "⚡ Para Potterheads:",
+    "instagram": "📸 Lugares SUPER instagrameables:",
+    "nearby": "📍 Más cerca de ti:",
+    "nearbyNoGps": "¡Activa el GPS (📍) para ver qué hay cerca!",
+    "free": "🎉 Cosas GRATIS:",
+    "museums": "🏛️ Museos GENIALES:",
+    "views": "🌆 Las mejores vistas:",
+    "brunch": "🥞 Lugares de brunch:",
+    "coffee": "☕ Cafés trendy:",
+    "sneakers": "👟 Sneakers HYPE:",
+    "burger": "🍔 Mejores burgers:",
+    "parks": "🌳 Central Park y parques:",
+    "brooklyn": "🌉 Vibras de Brooklyn:",
+    "timesSquare": "✨ En Times Square:",
+    "movies": "🎬 Locaciones de PELÍCULAS famosas:",
+    "iconic": "⭐ Lugares ICÓNICOS de NYC:",
+    "newjersey": "🌉 New Jersey con vistas a Manhattan:"
+  },
+  "units": {
+    "min": "min",
+    "hour": "h",
+    "meters": "m",
+    "km": "km",
+    "free": "Gratis"
+  },
+  "placeCard": {
+    "go": "Ir"
+  }
+}

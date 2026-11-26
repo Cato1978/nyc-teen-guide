@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 600" width="700" height="600">
+  <!-- Background -->
+  <rect width="700" height="600" fill="#f8f9fa"/>
+  
+  <!-- Title -->
+  <text x="350" y="35" fill="#333" font-family="Arial" font-size="22" font-weight="bold" text-anchor="middle">🔄 Flusso del Chatbot</text>
+  
+  <!-- Step 1: User Input -->
+  <rect x="250" y="60" width="200" height="50" rx="25" fill="#667eea"/>
+  <text x="350" y="92" fill="white" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle">👤 "Ho fame!"</text>
+  
+  <!-- Arrow 1 -->
+  <line x1="350" y1="110" x2="350" y2="140" stroke="#666" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- Step 2: Message Display -->
+  <rect x="225" y="145" width="250" height="45" rx="10" fill="white" stroke="#ddd" stroke-width="2"/>
+  <text x="350" y="174" fill="#555" font-family="Arial" font-size="12" text-anchor="middle">addMessage('Ho fame!', 'user')</text>
+  
+  <!-- Arrow 2 -->
+  <line x1="350" y1="190" x2="350" y2="220" stroke="#666" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- Step 3: Typing Animation -->
+  <rect x="225" y="225" width="250" height="45" rx="10" fill="#f0f0f0" stroke="#ddd" stroke-width="2"/>
+  <text x="350" y="254" fill="#555" font-family="Arial" font-size="12" text-anchor="middle">⏳ Typing... (600-1000ms)</text>
+  
+  <!-- Arrow 3 -->
+  <line x1="350" y1="270" x2="350" y2="300" stroke="#666" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- Step 4: NLP Processing -->
+  <rect x="175" y="305" width="350" height="80" rx="15" fill="#fff3e6" stroke="#f39c12" stroke-width="2"/>
+  <text x="350" y="330" fill="#e67e22" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle">🧠 generateResponse()</text>
+  <text x="350" y="355" fill="#666" font-family="Arial" font-size="11" text-anchor="middle">Keyword match: "fame" → Intent: cercare ristoranti</text>
+  <text x="350" y="375" fill="#666" font-family="Arial" font-size="11" text-anchor="middle">places.filter(p => p.category === 'food')</text>
+  
+  <!-- Arrow 4 -->
+  <line x1="350" y1="385" x2="350" y2="415" stroke="#666" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- Step 5: Filter & Sort -->
+  <rect x="200" y="420" width="300" height="50" rx="10" fill="#e7f3ff" stroke="#3498db" stroke-width="2"/>
+  <text x="350" y="452" fill="#2980b9" font-family="Arial" font-size="12" text-anchor="middle">.sort((a,b) => b.rating - a.rating).slice(0, 5)</text>
+  
+  <!-- Arrow 5 -->
+  <line x1="350" y1="470" x2="350" y2="500" stroke="#666" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- Step 6: Response -->
+  <rect x="150" y="505" width="400" height="80" rx="15" fill="#e8f8e8" stroke="#2ecc71" stroke-width="2"/>
+  <text x="350" y="535" fill="#27ae60" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle">📤 Bot Response</text>
+  <text x="350" y="560" fill="#666" font-family="Arial" font-size="11" text-anchor="middle">🍕 Joe's Pizza (350m • $3) [Vai]</text>
+  <text x="350" y="578" fill="#666" font-family="Arial" font-size="11" text-anchor="middle">🍔 Shake Shack (500m • $12) [Vai] ...</text>
+  
+  <!-- Side Info: Keywords -->
+  <rect x="20" y="305" width="140" height="120" rx="10" fill="white" stroke="#ddd" stroke-width="1"/>
+  <text x="90" y="328" fill="#333" font-family="Arial" font-size="11" font-weight="bold" text-anchor="middle">🔍 Keywords</text>
+  <text x="30" y="350" fill="#555" font-family="Arial" font-size="9">fame → food</text>
+  <text x="30" y="368" fill="#555" font-family="Arial" font-size="9">pizza → 🍕</text>
+  <text x="30" y="386" fill="#555" font-family="Arial" font-size="9">vicino → distance</text>
+  <text x="30" y="404" fill="#555" font-family="Arial" font-size="9">gratis → cost=0</text>
+  
+  <!-- Side Info: Output -->
+  <rect x="540" y="305" width="140" height="120" rx="10" fill="white" stroke="#ddd" stroke-width="1"/>
+  <text x="610" y="328" fill="#333" font-family="Arial" font-size="11" font-weight="bold" text-anchor="middle">📊 Output HTML</text>
+  <text x="550" y="350" fill="#555" font-family="Arial" font-size="9">• Nome + emoji</text>
+  <text x="550" y="368" fill="#555" font-family="Arial" font-size="9">• Distanza (se GPS)</text>
+  <text x="550" y="386" fill="#555" font-family="Arial" font-size="9">• Rating ⭐</text>
+  <text x="550" y="404" fill="#555" font-family="Arial" font-size="9">• Pulsante [Vai]</text>
+  
+  <!-- Definitions -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#666"/>
+    </marker>
+  </defs>
+</svg>

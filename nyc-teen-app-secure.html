@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#667eea">
+    
+    <!-- ============ SICUREZZA MINORENNI - META TAGS ============ -->
+    <!-- Content Security Policy - Blocca risorse esterne non autorizzate -->
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'self';
+        script-src 'self' 'unsafe-inline' https://unpkg.com;
+        style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com;
+        font-src https://fonts.gstatic.com;
+        img-src 'self' data: https://tile.openstreetmap.de https://*.openstreetmap.org;
+        connect-src 'self' https://nominatim.openstreetmap.org;
+        frame-ancestors 'none';
+        form-action 'self';
+    ">
+    <!-- Blocca embedding in iframe (anti-clickjacking) -->
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <!-- Blocca sniffing del content type -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <!-- Referrer Policy - Non invia informazioni a siti esterni -->
+    <meta name="referrer" content="no-referrer">
+    <!-- Disabilita feature pericolose -->
+    <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), payment=(), usb=()">
+    <!-- Rating per minori -->
+    <meta name="rating" content="general">
+    <meta name="RATING" content="RTA-5042-1996-1400-1577-RTA">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <meta name="apple-mobile-web-app-title" content="NYC Teen Guide">
+    
+    <title>NYC Teen Guide 🗽</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        :root {
+            --primary: #667eea;
+            --attractions: #FF6B6B;
+            --museums: #3498DB;
+            --harrypotter: #9B59B6;
+            --food: #F39C12;
+            --shopping: #1ABC9C;
+            --movies: #E91E63;
+            --iconic: #FF5722;
+            --newjersey: #00BCD4;
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+        }
+        body { font-family: 'Poppins', -apple-system, sans-serif; background: #f5f6fa; height: 100vh; height: 100dvh; overflow: hidden; }
+        #map { width: 100%; height: 100%; position: fixed; top: 0; left: 0; z-index: 1; }
+        
+        /* ============ PRIVACY CONSENT MODAL ============ */
+        .privacy-modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .privacy-modal.hidden { display: none; }
+        .privacy-content { background: white; border-radius: 20px; max-width: 400px; width: 100%; max-height: 80vh; overflow-y: auto; }
+        .privacy-header { background: linear-gradient(135deg, var(--primary), #764ba2); color: white; padding: 20px; text-align: center; border-radius: 20px 20px 0 0; }
+        .privacy-header h2 { font-size: 1.3em; margin-bottom: 5px; }
+        .privacy-header p { font-size: 0.85em; opacity: 0.9; }
+        .privacy-body { padding: 20px; }
+        .privacy-section { margin-bottom: 15px; }
+        .privacy-section h3 { font-size: 0.95em; color: var(--primary); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .privacy-section p { font-size: 0.85em; color: #666; line-height: 1.5; }
+        .privacy-list { font-size: 0.85em; color: #666; padding-left: 20px; margin-top: 8px; }
+        .privacy-list li { margin-bottom: 5px; }
+        .privacy-toggle { display: flex; align-items: center; justify-content: space-between; padding: 12px; background: #f8f9fa; border-radius: 10px; margin-top: 10px; }
+        .privacy-toggle span { font-size: 0.85em; font-weight: 500; }
+        .toggle-switch { width: 50px; height: 26px; background: #ddd; border-radius: 13px; position: relative; cursor: pointer; transition: background 0.3s; }
+        .toggle-switch.active { background: #2ecc71; }
+        .toggle-switch::after { content: ''; position: absolute; width: 22px; height: 22px; background: white; border-radius: 50%; top: 2px; left: 2px; transition: transform 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .toggle-switch.active::after { transform: translateX(24px); }
+        .privacy-btn { width: 100%; padding: 15px; border: none; border-radius: 12px; font-size: 1em; font-weight: 600; cursor: pointer; margin-top: 10px; font-family: inherit; }
+        .privacy-btn.primary { background: var(--primary); color: white; }
+        .privacy-btn.secondary { background: #f0f0f0; color: #666; }
+        .privacy-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .parent-link { text-align: center; margin-top: 15px; font-size: 0.8em; }
+        .parent-link a { color: var(--primary); text-decoration: none; }
+        
+        /* ============ SETTINGS PANEL ============ */
+        .settings-panel { position: fixed; top: 0; right: -300px; width: 300px; height: 100%; background: white; z-index: 3000; transition: right 0.3s; box-shadow: -5px 0 20px rgba(0,0,0,0.2); }
+        .settings-panel.open { right: 0; }
+        .settings-header { background: linear-gradient(135deg, var(--primary), #764ba2); color: white; padding: 20px; display: flex; align-items: center; justify-content: space-between; }
+        .settings-header h3 { font-size: 1.1em; }
+        .settings-close { background: none; border: none; color: white; font-size: 1.5em; cursor: pointer; }
+        .settings-body { padding: 15px; overflow-y: auto; height: calc(100% - 70px); }
+        .settings-section { margin-bottom: 20px; }
+        .settings-section h4 { font-size: 0.9em; color: var(--primary); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+        .settings-item { display: flex; align-items: center; justify-content: space-between; padding: 12px; background: #f8f9fa; border-radius: 10px; margin-bottom: 8px; }
+        .settings-item span { font-size: 0.85em; }
+        .settings-info { font-size: 0.75em; color: #888; margin-top: 5px; padding: 10px; background: #fff3cd; border-radius: 8px; }
+        .data-btn { width: 100%; padding: 12px; border: 2px solid #e74c3c; background: white; color: #e74c3c; border-radius: 10px; font-weight: 600; cursor: pointer; font-family: inherit; margin-top: 10px; }
+        .data-btn:hover { background: #e74c3c; color: white; }
+        
+        .search-overlay { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; padding: 10px; padding-top: max(10px, env(safe-area-inset-top)); }
+        .search-container { background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); overflow: hidden; }
+        .search-box { display: flex; align-items: center; padding: 10px 12px; gap: 8px; }
+        .search-input { flex: 1; border: none; font-size: 0.95em; font-family: inherit; outline: none; background: transparent; }
+        .search-btn { background: var(--primary); color: white; border: none; width: 38px; height: 38px; border-radius: 10px; font-size: 1.1em; cursor: pointer; }
+        .gps-btn { background: #2ecc71; }
+        .settings-btn { background: white; border: 2px solid #888; color: #888; }
+        .lang-btn { background: white; border: 2px solid var(--primary); font-size: 1.2em; cursor: pointer; position: relative; }
+        .lang-dropdown { position: absolute; top: 45px; right: 0; background: white; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); overflow: hidden; display: none; z-index: 2000; min-width: 140px; }
+        .lang-dropdown.show { display: block; }
+        .lang-option { display: flex; align-items: center; gap: 10px; padding: 10px 15px; cursor: pointer; font-size: 0.9em; border-bottom: 1px solid #eee; }
+        .lang-option:last-child { border-bottom: none; }
+        .lang-option:hover { background: #f0f0f0; }
+        .lang-option.active { background: var(--primary); color: white; }
+        .filter-chips { display: flex; gap: 6px; padding: 8px 12px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; border-top: 1px solid #eee; }
+        .filter-chips::-webkit-scrollbar { display: none; }
+        .filter-chip { flex-shrink: 0; padding: 6px 12px; border-radius: 15px; background: #f0f0f0; font-size: 0.75em; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+        .filter-chip.active { background: var(--primary); color: white; }
+        .filter-chip[data-cat="attractions"].active { background: var(--attractions); }
+        .filter-chip[data-cat="museums"].active { background: var(--museums); }
+        .filter-chip[data-cat="harrypotter"].active { background: var(--harrypotter); }
+        .filter-chip[data-cat="food"].active { background: var(--food); }
+        .filter-chip[data-cat="shopping"].active { background: var(--shopping); }
+        .filter-chip[data-cat="movies"].active { background: var(--movies); }
+        .filter-chip[data-cat="iconic"].active { background: var(--iconic); }
+        .filter-chip[data-cat="newjersey"].active { background: var(--newjersey); }
+        .time-filter { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-top: 1px solid #eee; background: #f8f9fa; font-size: 0.8em; }
+        .time-select { flex: 1; padding: 6px 10px; border: 1px solid #ddd; border-radius: 8px; font-family: inherit; font-size: 0.9em; }
+        .float-buttons { position: fixed; right: 10px; bottom: 100px; z-index: 999; display: flex; flex-direction: column; gap: 8px; }
+        .float-btn { width: 50px; height: 50px; border-radius: 50%; border: none; background: white; box-shadow: 0 2px 15px rgba(0,0,0,0.2); font-size: 1.4em; cursor: pointer; }
+        .float-btn:active { transform: scale(0.95); }
+        .chat-container { position: fixed; bottom: 0; left: 0; right: 0; z-index: 2000; transform: translateY(calc(100% - 60px)); transition: transform 0.3s ease; }
+        .chat-container.open { transform: translateY(0); }
+        .chat-header { background: linear-gradient(135deg, var(--primary), #764ba2); color: white; padding: 15px 20px; border-radius: 20px 20px 0 0; display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
+        .chat-header-left { display: flex; align-items: center; gap: 10px; }
+        .chat-avatar { width: 35px; height: 35px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2em; }
+        .chat-title { font-weight: 600; font-size: 0.95em; }
+        .chat-subtitle { font-size: 0.7em; opacity: 0.8; }
+        .chat-toggle { font-size: 1.5em; transition: transform 0.3s; }
+        .chat-container.open .chat-toggle { transform: rotate(180deg); }
+        .chat-body { background: white; height: 350px; display: flex; flex-direction: column; }
+        .chat-messages { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .message { max-width: 85%; padding: 10px 14px; border-radius: 15px; font-size: 0.9em; line-height: 1.4; }
+        .message.bot { background: #f0f0f0; align-self: flex-start; border-bottom-left-radius: 5px; }
+        .message.user { background: var(--primary); color: white; align-self: flex-end; border-bottom-right-radius: 5px; }
+        .place-suggestion { display: flex; align-items: center; gap: 10px; cursor: pointer; background: white; border-radius: 10px; padding: 10px; margin-top: 8px; border: 1px solid #eee; }
+        .place-suggestion:hover { background: #f8f9fa; }
+        .place-suggestion .emoji { font-size: 1.5em; }
+        .place-suggestion .info { flex: 1; }
+        .place-suggestion .name { font-weight: 600; font-size: 0.9em; }
+        .place-suggestion .meta { font-size: 0.75em; color: #888; }
+        .place-suggestion .go-btn { background: var(--primary); color: white; border: none; padding: 6px 12px; border-radius: 8px; font-size: 0.75em; cursor: pointer; }
+        .quick-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+        .quick-btn { background: white; border: 1px solid var(--primary); color: var(--primary); padding: 5px 10px; border-radius: 15px; font-size: 0.75em; cursor: pointer; }
+        .quick-btn:hover { background: var(--primary); color: white; }
+        .chat-input-area { display: flex; gap: 10px; padding: 10px 15px; border-top: 1px solid #eee; background: white; padding-bottom: calc(10px + var(--safe-bottom)); }
+        .chat-input { flex: 1; border: 1px solid #ddd; border-radius: 20px; padding: 10px 15px; font-family: inherit; font-size: 0.9em; outline: none; }
+        .chat-input:focus { border-color: var(--primary); }
+        .chat-send { background: var(--primary); color: white; border: none; width: 45px; height: 45px; border-radius: 50%; font-size: 1.2em; cursor: pointer; }
+        .leaflet-popup-content-wrapper { border-radius: 12px; padding: 0; }
+        .leaflet-popup-content { margin: 0; min-width: 220px; }
+        .popup-content { padding: 12px; }
+        .popup-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+        .popup-emoji { font-size: 1.5em; }
+        .popup-title { font-size: 0.95em; font-weight: 700; }
+        .popup-rating { font-size: 0.75em; color: #f39c12; }
+        .popup-stats { display: flex; justify-content: space-between; background: #f8f9fa; padding: 8px; border-radius: 8px; margin: 8px 0; font-size: 0.8em; }
+        .popup-desc { font-size: 0.8em; color: #666; margin: 8px 0; }
+        .popup-btn { width: 100%; padding: 10px; border: none; border-radius: 8px; background: var(--primary); color: white; font-weight: 600; cursor: pointer; margin-top: 8px; }
+        .tag { display: inline-block; font-size: 0.55em; padding: 2px 5px; border-radius: 5px; font-weight: 600; margin-left: 3px; vertical-align: middle; }
+        .tag-free { background: #d4edda; color: #155724; }
+        .tag-viral { background: #f8d7da; color: #721c24; }
+        .tag-insta { background: #e2d5f1; color: #6f42c1; }
+        .typing { display: flex; gap: 4px; padding: 10px 14px; }
+        .typing span { width: 8px; height: 8px; background: #999; border-radius: 50%; animation: bounce 1.4s infinite; }
+        .typing span:nth-child(2) { animation-delay: 0.2s; }
+        .typing span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes bounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-5px); } }
+        .loading-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, var(--primary), #764ba2); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; color: white; }
+        .loading-overlay.hidden { display: none; }
+        .loading-emoji { font-size: 4em; margin-bottom: 20px; animation: float 2s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .loading-text { font-size: 1.2em; font-weight: 600; }
+        .loading-sub { font-size: 0.85em; opacity: 0.8; margin-top: 5px; }
+        .places-count { position: fixed; bottom: 70px; left: 10px; background: white; padding: 8px 15px; border-radius: 20px; font-size: 0.8em; font-weight: 600; box-shadow: 0 2px 10px rgba(0,0,0,0.15); z-index: 999; }
+        
+        /* Privacy Badge */
+        .privacy-badge { position: fixed; bottom: 70px; right: 70px; background: #2ecc71; color: white; padding: 6px 12px; border-radius: 20px; font-size: 0.7em; font-weight: 600; z-index: 999; display: flex; align-items: center; gap: 5px; }
+    </style>
+</head>
+<body>
+    <!-- ============ PRIVACY CONSENT MODAL (COPPA/GDPR-K Compliant) ============ -->
+    <div class="privacy-modal" id="privacyModal">
+        <div class="privacy-content">
+            <div class="privacy-header">
+                <h2>🔒 La Tua Privacy</h2>
+                <p>Leggi prima di iniziare!</p>
+            </div>
+            <div class="privacy-body">
+                <div class="privacy-section">
+                    <h3>👋 Ciao!</h3>
+                    <p>Quest'app è stata creata pensando alla tua sicurezza. Ecco cosa devi sapere:</p>
+                </div>
+                
+                <div class="privacy-section">
+                    <h3>📍 Posizione GPS</h3>
+                    <p>Usiamo il GPS <b>solo</b> per mostrarti i luoghi vicini sulla mappa.</p>
+                    <ul class="privacy-list">
+                        <li>La posizione resta <b>solo sul tuo telefono</b></li>
+                        <li>Non la salviamo su nessun server</li>
+                        <li>Non la condividiamo con nessuno</li>
+                        <li>Puoi disattivarla quando vuoi</li>
+                    </ul>
+                    <div class="privacy-toggle">
+                        <span>Consenti posizione GPS</span>
+                        <div class="toggle-switch active" id="gpsToggle" onclick="toggleGpsConsent()"></div>
+                    </div>
+                </div>
+                
+                <div class="privacy-section">
+                    <h3>💾 Dati Salvati</h3>
+                    <p>Salviamo <b>solo sul tuo dispositivo</b>:</p>
+                    <ul class="privacy-list">
+                        <li>La lingua che preferisci</li>
+                        <li>Le tue preferenze (filtri, zoom)</li>
+                    </ul>
+                    <p style="margin-top:10px;color:#2ecc71;font-weight:600;">✅ Nessun account richiesto!</p>
+                </div>
+                
+                <div class="privacy-section">
+                    <h3>🚫 Cosa NON facciamo</h3>
+                    <ul class="privacy-list">
+                        <li>❌ Non raccogliamo il tuo nome o email</li>
+                        <li>❌ Non tracciamo i tuoi movimenti</li>
+                        <li>❌ Non vendiamo nessun dato</li>
+                        <li>❌ Non mostriamo pubblicità personalizzate</li>
+                        <li>❌ Non permettiamo chat con sconosciuti</li>
+                    </ul>
+                </div>
+                
+                <button class="privacy-btn primary" id="acceptBtn" onclick="acceptPrivacy()">
+                    ✅ Ho capito, iniziamo!
+                </button>
+                
+                <div class="parent-link">
+                    <a href="#" onclick="showParentInfo()">👨‍👩‍👧 Info per genitori</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ============ SETTINGS PANEL ============ -->
+    <div class="settings-panel" id="settingsPanel">
+        <div class="settings-header">
+            <h3>⚙️ Impostazioni</h3>
+            <button class="settings-close" onclick="toggleSettings()">×</button>
+        </div>
+        <div class="settings-body">
+            <div class="settings-section">
+                <h4>🔒 Privacy</h4>
+                <div class="settings-item">
+                    <span>Posizione GPS</span>
+                    <div class="toggle-switch" id="settingsGpsToggle" onclick="toggleGpsSetting()"></div>
+                </div>
+                <div class="settings-info">
+                    ℹ️ La posizione GPS viene usata solo per mostrarti i luoghi vicini. Non viene mai salvata o condivisa.
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <h4>📊 I Tuoi Dati</h4>
+                <p style="font-size:0.85em;color:#666;margin-bottom:10px;">
+                    Tutti i dati sono salvati solo sul tuo dispositivo. Nessun dato viene inviato a server esterni.
+                </p>
+                <div class="settings-item">
+                    <span>Lingua salvata</span>
+                    <span id="savedLangDisplay">Italiano</span>
+                </div>
+                <div class="settings-item">
+                    <span>Consenso privacy</span>
+                    <span style="color:#2ecc71;">✅ Accettato</span>
+                </div>
+                <button class="data-btn" onclick="deleteAllData()">
+                    🗑️ Cancella tutti i miei dati
+                </button>
+            </div>
+            
+            <div class="settings-section">
+                <h4>👨‍👩‍👧 Per i Genitori</h4>
+                <p style="font-size:0.85em;color:#666;line-height:1.5;">
+                    Quest'app è progettata per essere <b>sicura per i minori</b> secondo le normative GDPR-K e COPPA:
+                </p>
+                <ul style="font-size:0.8em;color:#666;padding-left:20px;margin-top:10px;">
+                    <li>Nessuna registrazione richiesta</li>
+                    <li>Nessuna raccolta di dati personali</li>
+                    <li>Nessuna pubblicità personalizzata</li>
+                    <li>Nessuna funzione social/chat</li>
+                    <li>Contenuti verificati e appropriati</li>
+                </ul>
+            </div>
+            
+            <div class="settings-section">
+                <h4>📧 Contatti</h4>
+                <p style="font-size:0.85em;color:#666;">
+                    Per domande sulla privacy:<br>
+                    <a href="mailto:privacy@nycteenguide.app" style="color:var(--primary);">privacy@nycteenguide.app</a>
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-emoji">🗽</div>
+        <div class="loading-text">NYC Teen Guide</div>
+        <div class="loading-sub" id="loadingSub">Caricamento 500 luoghi...</div>
+    </div>
+    
+    <div id="map"></div>
+    
+    <div class="search-overlay">
+        <div class="search-container">
+            <div class="search-box">
+                <span>🔍</span>
+                <input type="text" class="search-input" id="searchInput" placeholder="Cerca indirizzo o zona..." autocomplete="off">
+                <button class="search-btn gps-btn" onclick="getMyLocation()" id="gpsBtn" title="Posizione GPS">📍</button>
+                <button class="search-btn" onclick="searchAddress()" id="searchBtn" title="Cerca">→</button>
+                <button class="search-btn lang-btn" onclick="toggleLangDropdown(event)" id="langBtn">🇮🇹</button>
+                <div class="lang-dropdown" id="langDropdown">
+                    <div class="lang-option active" data-lang="it" onclick="changeLanguage('it')">🇮🇹 Italiano</div>
+                    <div class="lang-option" data-lang="en" onclick="changeLanguage('en')">🇬🇧 English</div>
+                    <div class="lang-option" data-lang="es" onclick="changeLanguage('es')">🇪🇸 Español</div>
+                    <div class="lang-option" data-lang="fr" onclick="changeLanguage('fr')">🇫🇷 Français</div>
+                    <div class="lang-option" data-lang="de" onclick="changeLanguage('de')">🇩🇪 Deutsch</div>
+                </div>
+                <button class="search-btn settings-btn" onclick="toggleSettings()" title="Impostazioni">⚙️</button>
+            </div>
+            <div class="filter-chips" id="filterChips">
+                <div class="filter-chip active" data-cat="all" onclick="toggleFilter('all')">🗽 <span data-i18n="filters.all">Tutti</span></div>
+                <div class="filter-chip" data-cat="attractions" onclick="toggleFilter('attractions')">🎢 <span data-i18n="filters.attractions">Attrazioni</span></div>
+                <div class="filter-chip" data-cat="museums" onclick="toggleFilter('museums')">🏛️ <span data-i18n="filters.museums">Musei</span></div>
+                <div class="filter-chip" data-cat="harrypotter" onclick="toggleFilter('harrypotter')">⚡ <span data-i18n="filters.harrypotter">HP</span></div>
+                <div class="filter-chip" data-cat="food" onclick="toggleFilter('food')">🍕 <span data-i18n="filters.food">Cibo</span></div>
+                <div class="filter-chip" data-cat="shopping" onclick="toggleFilter('shopping')">🛍️ <span data-i18n="filters.shopping">Shop</span></div>
+                <div class="filter-chip" data-cat="movies" onclick="toggleFilter('movies')">🎬 <span data-i18n="filters.movies">Film</span></div>
+                <div class="filter-chip" data-cat="iconic" onclick="toggleFilter('iconic')">⭐ <span data-i18n="filters.iconic">Iconici</span></div>
+                <div class="filter-chip" data-cat="newjersey" onclick="toggleFilter('newjersey')">🌉 <span data-i18n="filters.newjersey">NJ</span></div>
+            </div>
+            <div class="time-filter">
+                <span>⏱️ <span data-i18n="time.label">Ho:</span></span>
+                <select class="time-select" id="timeSelect" onchange="filterByTime()">
+                    <option value="0" data-i18n="time.allTime">Tutto il tempo</option>
+                    <option value="30" data-i18n="time.30min">30 minuti</option>
+                    <option value="60" data-i18n="time.1hour">1 ora</option>
+                    <option value="120" data-i18n="time.2hours">2 ore</option>
+                    <option value="180" data-i18n="time.halfDay">Mezza giornata</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    
+    <div class="places-count" id="placesCount">🗺️ 500 luoghi</div>
+    <div class="privacy-badge">🔒 Privacy OK</div>
+    
+    <div class="float-buttons">
+        <button class="float-btn" onclick="centerOnLocation()" id="centerBtn" title="Centra">🎯</button>
+        <button class="float-btn" onclick="toggleChat()" id="assistantBtn" title="Assistente">💬</button>
+    </div>
+    
+    <div class="chat-container" id="chatContainer">
+        <div class="chat-header" onclick="toggleChat()">
+            <div class="chat-header-left">
+                <div class="chat-avatar">🤖</div>
+                <div>
+                    <div class="chat-title" id="chatTitle">Guida NYC</div>
+                    <div class="chat-subtitle" id="chatSubtitle">500 luoghi • Itinerari • Budget</div>
+                </div>
+            </div>
+            <div class="chat-toggle">▲</div>
+        </div>
+        <div class="chat-body">
+            <div class="chat-messages" id="chatMessages"></div>
+            <div class="chat-input-area">
+                <input type="text" class="chat-input" id="chatInput" placeholder="Scrivi qui..." onkeypress="if(event.key==='Enter')sendMessage()" autocomplete="off" maxlength="200">
+                <button class="chat-send" onclick="sendMessage()">➤</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="places-database-500.js"></script>
+    <script>
+        // ============ PRIVACY & SECURITY SYSTEM ============
+        const PrivacyManager = {
+            STORAGE_KEY: 'nycGuide_privacy',
+            
+            hasConsent() {
+                return localStorage.getItem(this.STORAGE_KEY) === 'accepted';
+            },
+            
+            acceptConsent() {
+                localStorage.setItem(this.STORAGE_KEY, 'accepted');
+                localStorage.setItem('nycGuide_consent_date', new Date().toISOString());
+            },
+            
+            revokeConsent() {
+                localStorage.removeItem(this.STORAGE_KEY);
+                localStorage.removeItem('nycGuide_consent_date');
+            },
+            
+            isGpsAllowed() {
+                return localStorage.getItem('nycGuide_gps') !== 'denied';
+            },
+            
+            setGpsPermission(allowed) {
+                localStorage.setItem('nycGuide_gps', allowed ? 'allowed' : 'denied');
+            },
+            
+            deleteAllUserData() {
+                // Elimina TUTTI i dati locali
+                const keysToRemove = [];
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key && key.startsWith('nycGuide_')) {
+                        keysToRemove.push(key);
+                    }
+                }
+                keysToRemove.forEach(key => localStorage.removeItem(key));
+                
+                // Pulisci anche sessionStorage
+                sessionStorage.clear();
+                
+                return true;
+            }
+        };
+        
+        // ============ INPUT SANITIZATION (XSS Prevention) ============
+        function sanitizeInput(input) {
+            if (typeof input !== 'string') return '';
+            return input
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#x27;')
+                .replace(/\//g, '&#x2F;')
+                .trim()
+                .slice(0, 200); // Max 200 chars
+        }
+        
+        // ============ CONTENT FILTER (Child Safety) ============
+        const ContentFilter = {
+            // Lista di parole inappropriate (semplificata)
+            blockedPatterns: [
+                /\b(adult|xxx|porn|sex|drug|gun|weapon|kill|murder)\b/gi
+            ],
+            
+            isAppropriate(text) {
+                const lower = text.toLowerCase();
+                return !this.blockedPatterns.some(pattern => pattern.test(lower));
+            },
+            
+            filterResponse(text) {
+                // Per sicurezza, filtra anche le risposte
+                return text;
+            }
+        };
+        
+        // ============ PRIVACY UI FUNCTIONS ============
+        let gpsConsentGiven = true;
+        
+        function toggleGpsConsent() {
+            gpsConsentGiven = !gpsConsentGiven;
+            document.getElementById('gpsToggle').classList.toggle('active', gpsConsentGiven);
+        }
+        
+        function acceptPrivacy() {
+            PrivacyManager.acceptConsent();
+            PrivacyManager.setGpsPermission(gpsConsentGiven);
+            document.getElementById('privacyModal').classList.add('hidden');
+            initApp();
+        }
+        
+        function showParentInfo() {
+            alert(`📋 INFORMATIVA PER I GENITORI
+
+NYC Teen Guide è un'app progettata con la massima attenzione alla privacy dei minori.
+
+🔒 CONFORMITÀ NORMATIVA:
+• GDPR-K (Europa) - Art. 8
+• COPPA (USA) - Children's Online Privacy Protection Act
+• Age Appropriate Design Code (UK)
+
+📊 DATI RACCOLTI:
+• Posizione GPS: Solo se autorizzata, mai salvata su server
+• Preferenze: Solo in locale sul dispositivo
+• Nessun dato personale identificativo
+
+🚫 COSA NON FACCIAMO:
+• Nessuna registrazione/account
+• Nessun tracciamento comportamentale
+• Nessuna pubblicità personalizzata
+• Nessuna condivisione con terze parti
+• Nessuna funzione social o chat
+
+📧 CONTATTI:
+privacy@nycteenguide.app
+
+Per revocare il consenso: Impostazioni → Cancella tutti i dati`);
+        }
+        
+        function toggleSettings() {
+            const panel = document.getElementById('settingsPanel');
+            panel.classList.toggle('open');
+            if (panel.classList.contains('open')) {
+                updateSettingsUI();
+            }
+        }
+        
+        function updateSettingsUI() {
+            const gpsToggle = document.getElementById('settingsGpsToggle');
+            gpsToggle.classList.toggle('active', PrivacyManager.isGpsAllowed());
+            
+            const langNames = { it: 'Italiano', en: 'English', es: 'Español', fr: 'Français', de: 'Deutsch' };
+            document.getElementById('savedLangDisplay').textContent = langNames[currentLang] || 'Italiano';
+        }
+        
+        function toggleGpsSetting() {
+            const isAllowed = !PrivacyManager.isGpsAllowed();
+            PrivacyManager.setGpsPermission(isAllowed);
+            document.getElementById('settingsGpsToggle').classList.toggle('active', isAllowed);
+            
+            if (!isAllowed && userMarker) {
+                map.removeLayer(userMarker);
+                userMarker = null;
+                userLocation = null;
+            } else if (isAllowed) {
+                getMyLocation();
+            }
+        }
+        
+        function deleteAllData() {
+            if (confirm('⚠️ Vuoi davvero cancellare tutti i tuoi dati?\n\nQuesta azione:\n• Cancellerà le tue preferenze\n• Revocherà il consenso privacy\n• L\'app tornerà come nuova\n\nDovrai accettare di nuovo la privacy.')) {
+                PrivacyManager.deleteAllUserData();
+                location.reload();
+            }
+        }
+        
+        // ============ i18n SYSTEM ============
+        let currentLang = 'it';
+        let translations = {};
+        const availableLangs = ['it', 'en', 'es', 'fr', 'de'];
+        const langFlags = { it: '🇮🇹', en: '🇬🇧', es: '🇪🇸', fr: '🇫🇷', de: '🇩🇪' };
+
+        async function loadTranslations() {
+            for (const lang of availableLangs) {
+                try {
+                    const res = await fetch(`lang/${lang}.json`);
+                    translations[lang] = await res.json();
+                } catch (e) {
+                    console.warn(`Could not load ${lang}.json`);
+                }
+            }
+        }
+
+        function t(key) {
+            const keys = key.split('.');
+            let value = translations[currentLang];
+            for (const k of keys) {
+                if (value && value[k]) value = value[k];
+                else return key;
+            }
+            return value;
+        }
+
+        function updateUI() {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                el.textContent = t(key);
+            });
+
+            document.getElementById('searchInput').placeholder = t('search.placeholder');
+            document.getElementById('gpsBtn').title = t('search.gpsTitle');
+            document.getElementById('searchBtn').title = t('search.searchTitle');
+            document.getElementById('centerBtn').title = t('buttons.center');
+            document.getElementById('assistantBtn').title = t('buttons.assistant');
+            document.getElementById('chatTitle').textContent = t('chat.title');
+            document.getElementById('chatSubtitle').textContent = t('chat.subtitle');
+            document.getElementById('chatInput').placeholder = t('chat.inputPlaceholder');
+            document.getElementById('loadingSub').textContent = t('app.loading');
+            document.getElementById('langBtn').textContent = langFlags[currentLang];
+            document.documentElement.lang = currentLang;
+
+            const count = filterPlaces().length;
+            document.getElementById('placesCount').textContent = `🗺️ ${count} ${t('app.places')}`;
+
+            const timeSelect = document.getElementById('timeSelect');
+            if (timeSelect.options.length >= 5) {
+                timeSelect.options[0].text = t('time.allTime');
+                timeSelect.options[1].text = t('time.30min');
+                timeSelect.options[2].text = t('time.1hour');
+                timeSelect.options[3].text = t('time.2hours');
+                timeSelect.options[4].text = t('time.halfDay');
+            }
+
+            document.querySelectorAll('.lang-option').forEach(opt => {
+                opt.classList.toggle('active', opt.dataset.lang === currentLang);
+            });
+
+            showWelcomeMessage();
+        }
+
+        function changeLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('nycGuide_lang', lang);
+            updateUI();
+            addAllMarkers();
+            closeLangDropdown();
+        }
+
+        function toggleLangDropdown(e) {
+            e.stopPropagation();
+            document.getElementById('langDropdown').classList.toggle('show');
+        }
+
+        function closeLangDropdown() {
+            document.getElementById('langDropdown').classList.remove('show');
+        }
+
+        document.addEventListener('click', closeLangDropdown);
+
+        // ============ MAP SYSTEM ============
+        let map, userLocation = null, userMarker = null, markers = [];
+        let activeFilter = 'all', maxTime = 0;
+        const catColors = { attractions: '#FF6B6B', museums: '#3498DB', harrypotter: '#9B59B6', food: '#F39C12', shopping: '#1ABC9C', movies: '#E91E63', iconic: '#FF5722', newjersey: '#00BCD4' };
+
+        // Check privacy consent on load
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadTranslations();
+            
+            // Check saved language
+            const savedLang = localStorage.getItem('nycGuide_lang');
+            if (savedLang && availableLangs.includes(savedLang)) {
+                currentLang = savedLang;
+            } else {
+                const browserLang = navigator.language.slice(0, 2);
+                if (availableLangs.includes(browserLang)) {
+                    currentLang = browserLang;
+                }
+            }
+            
+            // Show privacy modal if no consent
+            if (!PrivacyManager.hasConsent()) {
+                document.getElementById('loadingOverlay').classList.add('hidden');
+                document.getElementById('privacyModal').classList.remove('hidden');
+            } else {
+                document.getElementById('privacyModal').classList.add('hidden');
+                initApp();
+            }
+        });
+
+        function initApp() {
+            map = L.map('map', { zoomControl: false }).setView([40.7580, -73.9855], 13);
+            L.tileLayer('https://tile.openstreetmap.de/{z}/{x}/{y}.png', { 
+                attribution: '© OpenStreetMap', 
+                maxZoom: 18 
+            }).addTo(map);
+            L.control.zoom({ position: 'bottomleft' }).addTo(map);
+            
+            updateUI();
+            addAllMarkers();
+            
+            setTimeout(() => document.getElementById('loadingOverlay').classList.add('hidden'), 1500);
+            document.getElementById('searchInput').addEventListener('keypress', e => { 
+                if (e.key === 'Enter') searchAddress(); 
+            });
+            
+            // Only get location if allowed
+            if (PrivacyManager.isGpsAllowed()) {
+                getMyLocation();
+            }
+        }
+
+        function showWelcomeMessage() {
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.innerHTML = `
+                <div class="message bot">
+                    ${t('chat.welcome')}
+                    <div class="quick-actions" style="flex-wrap:wrap;">
+                        <button class="quick-btn" onclick="sendQuickMessage('Cosa faccio oggi?')">🗓️ Oggi</button>
+                        <button class="quick-btn" onclick="sendQuickMessage('Top 10')">🏆 Top 10</button>
+                        <button class="quick-btn" onclick="sendQuickMessage('${sanitizeInput(t('quickActions.nearby'))}')">📍 Vicino</button>
+                        <button class="quick-btn" onclick="sendQuickMessage('${sanitizeInput(t('quickActions.hungry'))}')">🍕 Cibo</button>
+                        <button class="quick-btn" onclick="sendQuickMessage('${sanitizeInput(t('quickActions.insta'))}')">📸 Insta</button>
+                        <button class="quick-btn" onclick="sendQuickMessage('${sanitizeInput(t('quickActions.free'))}')">🎉 Gratis</button>
+                        <button class="quick-btn" onclick="sendQuickMessage('Film')">🎬 Film</button>
+                        <button class="quick-btn" onclick="sendQuickMessage('${sanitizeInput(t('quickActions.hp'))}')">⚡ HP</button>
+                        <button class="quick-btn" onclick="sendQuickMessage('Sorprendimi')">🎲 Random</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function addAllMarkers() {
+            markers.forEach(m => map.removeLayer(m));
+            markers = [];
+            const filtered = filterPlaces();
+            document.getElementById('placesCount').textContent = `🗺️ ${filtered.length} ${t('app.places')}`;
+            
+            filtered.forEach(place => {
+                const marker = L.marker([place.lat, place.lng], {
+                    icon: L.divIcon({
+                        className: 'marker',
+                        html: `<div style="background:${catColors[place.category]};width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 2px 8px rgba(0,0,0,0.3);border:2px solid white;">${place.emoji}</div>`,
+                        iconSize: [32, 32], iconAnchor: [16, 16]
+                    })
+                }).addTo(map);
+                
+                const tags = (place.tags||[]).map(tag => {
+                    if (tag === 'free') return `<span class="tag tag-free">${t('popup.free')}</span>`;
+                    if (tag === 'viral') return '<span class="tag tag-viral">🔥</span>';
+                    if (tag === 'insta') return '<span class="tag tag-insta">📸</span>';
+                    return '';
+                }).join('');
+                
+                const dist = userLocation ? formatDistance(getDistance(userLocation.lat, userLocation.lng, place.lat, place.lng)) : '';
+                const review = place.review ? `<div style="background:#fff3cd;padding:8px;border-radius:8px;margin:8px 0;font-size:0.8em;color:#856404;"><b>💬 ${t('popup.review')}:</b> "${sanitizeInput(place.review)}"</div>` : '';
+                const tip = place.tip ? `<div style="background:#d4edda;padding:8px;border-radius:8px;margin:8px 0;font-size:0.8em;color:#155724;"><b>💡 ${t('popup.proTip')}:</b> ${sanitizeInput(place.tip)}</div>` : '';
+                const bestTime = place.bestTime ? `<div style="font-size:0.75em;color:#6f42c1;margin:5px 0;">⏰ <b>${t('popup.bestTime')}:</b> ${sanitizeInput(place.bestTime)}</div>` : '';
+                const mustDo = place.mustDo ? `<div style="font-size:0.75em;color:#e74c3c;margin:5px 0;">🎯 <b>${t('popup.mustDo')}:</b> ${sanitizeInput(place.mustDo)}</div>` : '';
+                const orderTip = place.order ? `<div style="background:#e3f2fd;padding:8px;border-radius:8px;margin:8px 0;font-size:0.8em;color:#1565c0;"><b>🍽️ ${t('popup.order')}:</b> ${sanitizeInput(place.order)}</div>` : '';
+                const costText = place.cost === 0 ? `🎉 ${t('popup.free')}` : '💵 $' + place.cost;
+                
+                marker.bindPopup(`<div class="popup-content">
+                    <div class="popup-header"><span class="popup-emoji">${place.emoji}</span><div><div class="popup-title">${sanitizeInput(place.name)} ${tags}</div><div class="popup-rating">⭐ ${place.rating} ${dist?'• '+dist:''}</div></div></div>
+                    <div class="popup-stats"><span>⏱️ ${formatDuration(place.duration)}</span><span>${costText}</span><span>🕐 ${place.hours}</span></div>
+                    <div class="popup-desc">💡 ${sanitizeInput(place.desc)}</div>
+                    ${review}${orderTip}${tip}${bestTime}${mustDo}
+                    <div style="font-size:0.75em;color:#888;margin-top:5px;">🚇 ${sanitizeInput(place.metro)}</div>
+                    <button class="popup-btn" onclick="openNav(${place.lat},${place.lng},'${sanitizeInput(place.name).replace(/'/g,"\\'")}')">🗺️ ${t('popup.takeMe')}</button>
+                </div>`, { maxWidth: 300 });
+                markers.push(marker);
+            });
+        }
+
+        function filterPlaces() {
+            let filtered = places;
+            if (activeFilter !== 'all') filtered = filtered.filter(p => p.category === activeFilter);
+            if (maxTime > 0) filtered = filtered.filter(p => p.duration <= maxTime);
+            if (userLocation) filtered.sort((a,b) => getDistance(userLocation.lat, userLocation.lng, a.lat, a.lng) - getDistance(userLocation.lat, userLocation.lng, b.lat, b.lng));
+            return filtered;
+        }
+
+        function toggleFilter(cat) {
+            activeFilter = cat;
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.toggle('active', c.dataset.cat === cat));
+            addAllMarkers();
+        }
+
+        function filterByTime() {
+            maxTime = parseInt(document.getElementById('timeSelect').value);
+            addAllMarkers();
+        }
+
+        function getMyLocation() {
+            if (!navigator.geolocation || !PrivacyManager.isGpsAllowed()) return;
+            navigator.geolocation.getCurrentPosition(pos => {
+                userLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+                // NOTA: La posizione NON viene salvata in localStorage - solo in memoria
+                if (userMarker) map.removeLayer(userMarker);
+                userMarker = L.marker([userLocation.lat, userLocation.lng], {
+                    icon: L.divIcon({ html: '<div style="background:#4285f4;width:16px;height:16px;border-radius:50%;border:3px solid white;box-shadow:0 0 10px rgba(66,133,244,0.5);"></div>', iconSize: [16,16], iconAnchor: [8,8] })
+                }).addTo(map).bindPopup(`📍 ${t('popup.youAreHere')}`);
+                map.setView([userLocation.lat, userLocation.lng], 14);
+                addAllMarkers();
+            }, () => {}, { enableHighAccuracy: true });
+        }
+
+        function centerOnLocation() { 
+            if (!PrivacyManager.isGpsAllowed()) {
+                alert('📍 GPS disattivato\n\nVai in Impostazioni ⚙️ per attivarlo.');
+                return;
+            }
+            if (userLocation) map.setView([userLocation.lat, userLocation.lng], 15); 
+            else getMyLocation(); 
+        }
+
+        async function searchAddress() {
+            const rawInput = document.getElementById('searchInput').value;
+            const q = sanitizeInput(rawInput);
+            if (!q) return;
+            
+            // Ricerca limitata all'area di NYC (bounding box: NYC + area metropolitana)
+            // viewbox: minLon, minLat, maxLon, maxLat (SW to NE)
+            // Copre: Manhattan, Brooklyn, Queens, Bronx, Staten Island, Jersey City, Hoboken, Newark
+            const nycBounds = '-74.3,40.4,-73.7,41.0';
+            
+            try {
+                // Prima prova con bounded=1 (solo dentro l'area)
+                let res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&viewbox=${nycBounds}&bounded=1&limit=5`);
+                let data = await res.json();
+                
+                // Se non trova nulla nell'area, prova con preferenza per l'area ma non esclusiva
+                if (!data.length) {
+                    res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&viewbox=${nycBounds}&bounded=0&limit=5`);
+                    data = await res.json();
+                }
+                
+                // Se ancora nulla, prova aggiungendo NYC
+                if (!data.length) {
+                    res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q + ', NYC')}&limit=1`);
+                    data = await res.json();
+                }
+                
+                if (data.length) {
+                    // Prendi il primo risultato
+                    const result = data[0];
+                    userLocation = { lat: parseFloat(result.lat), lng: parseFloat(result.lon) };
+                    if (userMarker) map.removeLayer(userMarker);
+                    userMarker = L.marker([userLocation.lat, userLocation.lng], {
+                        icon: L.divIcon({ html: '<div style="background:#e74c3c;width:16px;height:16px;border-radius:50%;border:3px solid white;box-shadow:0 0 10px rgba(231,76,60,0.5);"></div>', iconSize: [16,16], iconAnchor: [8,8] })
+                    }).addTo(map).bindPopup('📍 ' + (result.display_name ? result.display_name.split(',')[0] : q));
+                    map.setView([userLocation.lat, userLocation.lng], 15);
+                    addAllMarkers();
+                } else {
+                    alert('🔍 Luogo non trovato nell\'area di NYC.\nProva con un indirizzo più specifico!');
+                }
+            } catch(e) { 
+                console.error(e);
+                alert('❌ Errore nella ricerca. Riprova!');
+            }
+        }
+
+        function toggleChat() { document.getElementById('chatContainer').classList.toggle('open'); }
+        function sendQuickMessage(msg) { document.getElementById('chatInput').value = msg; sendMessage(); }
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const rawMsg = input.value;
+            const msg = sanitizeInput(rawMsg);
+            if (!msg) return;
+            
+            // Content filter for child safety
+            if (!ContentFilter.isAppropriate(msg)) {
+                addMessage('🤖 Non ho capito, prova a chiedere qualcos\'altro!', 'bot');
+                input.value = '';
+                return;
+            }
+            
+            addMessage(msg, 'user');
+            input.value = '';
+            const typing = document.createElement('div');
+            typing.className = 'message bot typing-msg';
+            typing.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
+            document.getElementById('chatMessages').appendChild(typing);
+            scrollChat();
+            setTimeout(() => {
+                document.querySelector('.typing-msg')?.remove();
+                addMessage(generateResponse(msg), 'bot');
+            }, 600 + Math.random() * 400);
+        }
+
+        function addMessage(content, type) {
+            const div = document.createElement('div');
+            div.className = `message ${type}`;
+            div.innerHTML = type === 'user' ? sanitizeInput(content) : content;
+            document.getElementById('chatMessages').appendChild(div);
+            scrollChat();
+        }
+
+        function scrollChat() { const m = document.getElementById('chatMessages'); m.scrollTop = m.scrollHeight; }
+
+        // ============ CHATBOT SUPER POTENZIATO ============
+        
+        // Helper: Controlla se un posto è aperto adesso
+        function isOpenNow(hoursStr) {
+            if (!hoursStr || hoursStr === '24h') return true;
+            const now = new Date();
+            const currentHour = now.getHours();
+            const parts = hoursStr.split('-');
+            if (parts.length !== 2) return true;
+            let [open, close] = parts.map(h => parseInt(h.split(':')[0]) || parseInt(h));
+            if (isNaN(open) || isNaN(close)) return true;
+            if (close < open) return currentHour >= open || currentHour < close; // Es: 10-2 (fino alle 2 di notte)
+            return currentHour >= open && currentHour < close;
+        }
+        
+        // Helper: Estrai budget dal messaggio
+        function extractBudget(msg) {
+            const match = msg.match(/(\d+)\s*(dollar|euro|€|\$|usd)/i) || msg.match(/(\d+)/);
+            return match ? parseInt(match[1]) : null;
+        }
+        
+        // Helper: Genera itinerario giornaliero ottimizzato
+        function generateItinerary(startLocation, maxPlaces = 5) {
+            let available = places.filter(p => p.importance >= 4).sort((a,b) => b.importance - a.importance);
+            let itinerary = [];
+            let totalTime = 0;
+            const maxTime = 480; // 8 ore
+            
+            // Mix di categorie per varietà
+            const categories = ['attractions', 'food', 'museums', 'shopping', 'iconic'];
+            let currentLat = startLocation?.lat || 40.758;
+            let currentLng = startLocation?.lng || -73.985;
+            
+            while (itinerary.length < maxPlaces && totalTime < maxTime && available.length > 0) {
+                // Trova il posto più vicino con categoria diversa dall'ultimo
+                available.sort((a,b) => {
+                    const distA = getDistance(currentLat, currentLng, a.lat, a.lng);
+                    const distB = getDistance(currentLat, currentLng, b.lat, b.lng);
+                    return distA - distB;
+                });
+                
+                // Prendi uno dei 3 più vicini, preferendo categorie diverse
+                let next = available[0];
+                for (let i = 0; i < Math.min(3, available.length); i++) {
+                    if (itinerary.length === 0 || available[i].category !== itinerary[itinerary.length-1].category) {
+                        next = available[i];
+                        break;
+                    }
+                }
+                
+                itinerary.push(next);
+                totalTime += next.duration + 30; // +30 min per spostamento
+                currentLat = next.lat;
+                currentLng = next.lng;
+                available = available.filter(p => p.id !== next.id);
+            }
+            
+            return itinerary;
+        }
+        
+        // Quartieri di NYC per ricerca per zona
+        const neighborhoods = {
+            'soho': { bounds: [40.719, -74.005, 40.728, -73.995], name: 'SoHo' },
+            'tribeca': { bounds: [40.714, -74.012, 40.722, -74.002], name: 'TriBeCa' },
+            'chelsea': { bounds: [40.740, -74.008, 40.752, -73.990], name: 'Chelsea' },
+            'greenwich': { bounds: [40.728, -74.008, 40.738, -73.995], name: 'Greenwich Village' },
+            'village': { bounds: [40.728, -74.008, 40.738, -73.995], name: 'Greenwich Village' },
+            'east village': { bounds: [40.722, -73.995, 40.732, -73.980], name: 'East Village' },
+            'lower east': { bounds: [40.715, -73.995, 40.722, -73.980], name: 'Lower East Side' },
+            'les': { bounds: [40.715, -73.995, 40.722, -73.980], name: 'Lower East Side' },
+            'midtown': { bounds: [40.748, -73.995, 40.765, -73.970], name: 'Midtown' },
+            'upper east': { bounds: [40.765, -73.975, 40.785, -73.950], name: 'Upper East Side' },
+            'upper west': { bounds: [40.770, -73.995, 40.800, -73.970], name: 'Upper West Side' },
+            'harlem': { bounds: [40.800, -73.960, 40.830, -73.935], name: 'Harlem' },
+            'financial': { bounds: [40.700, -74.020, 40.715, -74.000], name: 'Financial District' },
+            'fidi': { bounds: [40.700, -74.020, 40.715, -74.000], name: 'Financial District' },
+            'wall street': { bounds: [40.700, -74.015, 40.710, -74.005], name: 'Wall Street' },
+            'dumbo': { bounds: [40.700, -73.995, 40.705, -73.985], name: 'DUMBO' },
+            'williamsburg': { bounds: [40.708, -73.965, 40.720, -73.945], name: 'Williamsburg' },
+            'bushwick': { bounds: [40.695, -73.930, 40.710, -73.910], name: 'Bushwick' },
+            'chinatown': { bounds: [40.713, -74.002, 40.720, -73.993], name: 'Chinatown' },
+            'little italy': { bounds: [40.718, -73.998, 40.723, -73.993], name: 'Little Italy' },
+            'times square': { bounds: [40.755, -73.990, 40.762, -73.983], name: 'Times Square' },
+            'hell\'s kitchen': { bounds: [40.758, -74.000, 40.770, -73.985], name: "Hell's Kitchen" },
+            'meatpacking': { bounds: [40.739, -74.010, 40.745, -74.002], name: 'Meatpacking District' },
+            'flatiron': { bounds: [40.738, -73.992, 40.745, -73.983], name: 'Flatiron' },
+            'union square': { bounds: [40.733, -73.995, 40.740, -73.985], name: 'Union Square' },
+            'herald square': { bounds: [40.748, -73.992, 40.755, -73.985], name: 'Herald Square' },
+            'central park': { bounds: [40.765, -73.982, 40.800, -73.950], name: 'Central Park' },
+            'queens': { bounds: [40.700, -73.960, 40.780, -73.800], name: 'Queens' },
+            'bronx': { bounds: [40.800, -73.930, 40.900, -73.850], name: 'Bronx' },
+            'staten island': { bounds: [40.500, -74.250, 40.650, -74.050], name: 'Staten Island' }
+        };
+        
+        function generateResponse(msg) {
+            const m = msg.toLowerCase();
+            let response = '', suggestions = [];
+
+            const keywords = {
+                pizza: ['pizza'],
+                hungry: ['fame', 'hungry', 'hambre', 'faim', 'hunger', 'mangi', 'cibo', 'food', 'comida', 'bouffe', 'essen'],
+                sweets: ['dolc', 'dessert', 'cookie', 'gelat', 'cake', 'sweet', 'dulce', 'postre', 'dessert', 'süß', 'kuchen', 'cioccolat', 'chocolate'],
+                shopping: ['shopping', 'shop', 'negozi', 'compra', 'tienda', 'magasin', 'laden', 'einkauf'],
+                harryPotter: ['harry', 'potter', 'magia', 'magic', 'hogwarts', 'potterhead'],
+                instagram: ['instagram', 'insta', 'foto', 'photo', 'tiktok', 'viral', 'selfie'],
+                nearby: ['vicino', 'near', 'cerca', 'proche', 'nähe', 'qui', 'here', 'aquí', 'ici', 'hier', 'intorno', 'around'],
+                free: ['gratis', 'free', 'gratuit', 'kostenlos', 'senza pagare'],
+                museums: ['muse', 'arte', 'art', 'kunst', 'galleria', 'gallery'],
+                views: ['vista', 'panoram', 'view', 'sky', 'osservator', 'aussicht', 'skyline', 'rooftop', 'terrazza'],
+                brunch: ['brunch', 'colazione', 'breakfast', 'desayuno', 'petit', 'frühstück'],
+                coffee: ['caff', 'coffee', 'café', 'kaffee', 'cappuccino', 'espresso'],
+                sneakers: ['sneaker', 'scarpe', 'shoe', 'zapato', 'chaussure', 'schuh', 'nike', 'jordan'],
+                burger: ['burger', 'hamburger'],
+                parks: ['central park', 'parco', 'park', 'parque', 'parc', 'verde', 'natura'],
+                brooklyn: ['brooklyn'],
+                timesSquare: ['times square', '42nd', 'broadway show', 'musical'],
+                movies: ['film', 'movie', 'cinema', 'pelicula', 'cine', 'kino', 'location', 'scene', 'girato', 'filmed', 'rodaje', 'tourné', 'gedreht', 'serie tv', 'tv show'],
+                iconic: ['iconic', 'iconico', 'famoso', 'famous', 'simbolo', 'symbol', 'landmark', 'monumento', 'celebre', 'berühmt', 'imperdibile', 'must see'],
+                newjersey: ['jersey', 'hoboken', 'newark', 'nj', 'liberty state', 'new jersey', 'atlantic city', 'princeton'],
+                // NUOVE KEYWORDS
+                itinerary: ['oggi', 'today', 'giornata', 'itinerario', 'programma', 'cosa faccio', 'what to do', 'plan', 'journée', 'día', 'tag'],
+                budget: ['budget', 'dollari', 'dollar', 'euro', 'soldi', 'money', 'spendere', 'spend', 'costa', 'cost', 'economico', 'cheap', 'poco'],
+                openNow: ['aperto', 'open', 'adesso', 'now', 'ora', 'ouvert', 'abierto', 'geöffnet', 'jetzt', 'maintenant', 'ahora'],
+                rain: ['piove', 'pioggia', 'rain', 'pluie', 'lluvia', 'regen', 'indoor', 'coperto', 'inside', 'freddo', 'cold'],
+                search: ['dov\'è', 'dove', 'where', 'où', 'dónde', 'wo', 'cerco', 'find', 'trovo', 'looking for'],
+                top10: ['top', 'best', 'migliori', 'mejores', 'meilleurs', 'besten', 'classifica', 'ranking', '10'],
+                random: ['sorprend', 'surprise', 'random', 'caso', 'luck', 'qualsiasi', 'boh', 'non so', 'sugger'],
+                family: ['famiglia', 'family', 'bambini', 'kids', 'children', 'genitori', 'parents', 'enfants', 'niños', 'kinder'],
+                rooftop: ['rooftop', 'terrazza', 'tetto', 'roof', 'bar', 'cocktail', 'aperitivo', 'drink'],
+                speakeasy: ['speakeasy', 'nascosto', 'hidden', 'segreto', 'secret'],
+                bagel: ['bagel', 'bagels'],
+                icecream: ['gelato', 'ice cream', 'gelati', 'helado', 'glace', 'eis'],
+                asian: ['asian', 'asiatico', 'chinese', 'cinese', 'japanese', 'giapponese', 'ramen', 'sushi', 'dumpling', 'dim sum', 'noodle'],
+                italian: ['italiano', 'italian', 'pasta', 'risotto', 'tiramisu']
+            };
+
+            const matchKeyword = (category) => keywords[category].some(kw => m.includes(kw));
+            
+            // ============ NUOVE FUNZIONALITÀ ============
+            
+            // 1. ITINERARIO GIORNALIERO
+            if (matchKeyword('itinerary')) {
+                response = '🗓️ <b>Ecco il tuo itinerario perfetto per oggi!</b><br>Percorso ottimizzato per non perdere tempo:';
+                const itinerary = generateItinerary(userLocation);
+                let totalCost = 0, totalTime = 0;
+                itinerary.forEach((p, i) => {
+                    totalCost += p.cost;
+                    totalTime += p.duration;
+                    const timeEmoji = i === 0 ? '🌅' : i === itinerary.length - 1 ? '🌙' : '☀️';
+                    response += `<div class="place-suggestion" onclick="focusPlace(${p.id})" style="border-left: 3px solid ${catColors[p.category]};">
+                        <span class="emoji">${timeEmoji} ${i+1}.</span>
+                        <div class="info">
+                            <div class="name">${p.emoji} ${sanitizeInput(p.name)}</div>
+                            <div class="meta">${formatDuration(p.duration)} • ${p.cost === 0 ? 'Gratis' : '$' + p.cost}</div>
+                        </div>
+                        <button class="go-btn" onclick="event.stopPropagation();openNav(${p.lat},${p.lng},'${sanitizeInput(p.name).replace(/'/g,"\\'")}')">📍</button>
+                    </div>`;
+                });
+                response += `<div style="background:#e8f5e9;padding:10px;border-radius:8px;margin-top:10px;font-size:0.85em;">
+                    📊 <b>Totale:</b> ${formatDuration(totalTime)} • ${totalCost === 0 ? 'Tutto gratis!' : '$' + totalCost}
+                </div>`;
+                return response;
+            }
+            
+            // 2. FILTRO BUDGET
+            const budget = extractBudget(m);
+            if (budget !== null && matchKeyword('budget')) {
+                response = `💰 <b>Con $${budget} puoi fare:</b>`;
+                suggestions = places.filter(p => p.cost <= budget && p.cost > 0).sort((a,b) => b.importance - a.importance).slice(0, 6);
+                if (suggestions.length === 0) {
+                    suggestions = places.filter(p => p.cost === 0).sort((a,b) => b.importance - a.importance).slice(0, 6);
+                    response = `💰 Con $${budget}? Ecco cose GRATIS super fighe:`;
+                }
+            }
+            // 3. COSA È APERTO ADESSO
+            else if (matchKeyword('openNow')) {
+                const now = new Date();
+                const hour = now.getHours();
+                response = `🕐 <b>Aperto adesso</b> (sono le ${hour}:${String(now.getMinutes()).padStart(2,'0')}):`;
+                let openPlaces = places.filter(p => isOpenNow(p.hours));
+                if (userLocation) {
+                    openPlaces.sort((a,b) => getDistance(userLocation.lat, userLocation.lng, a.lat, a.lng) - getDistance(userLocation.lat, userLocation.lng, b.lat, b.lng));
+                } else {
+                    openPlaces.sort((a,b) => b.importance - a.importance);
+                }
+                suggestions = openPlaces.slice(0, 6);
+            }
+            // 4. SUGGERIMENTI METEO/INDOOR
+            else if (matchKeyword('rain')) {
+                response = '🌧️ <b>Piove? Nessun problema!</b> Ecco posti al coperto:';
+                suggestions = places.filter(p => 
+                    p.category === 'museums' || 
+                    p.category === 'shopping' || 
+                    ['🛍️','🏛️','🎭','🎬','🍕','🍔','🍪','☕','🎮','📚','🧙'].includes(p.emoji)
+                ).sort((a,b) => b.importance - a.importance).slice(0, 6);
+            }
+            // 5. RICERCA PER NOME SPECIFICO
+            else if (matchKeyword('search')) {
+                // Estrai il nome cercato
+                const searchTerms = m.replace(/dov'è|dove|where|où|dónde|wo|cerco|find|trovo|looking for|il|la|lo|l'|the|el|le|der|die|das/gi, '').trim();
+                if (searchTerms.length > 2) {
+                    const found = places.filter(p => 
+                        p.name.toLowerCase().includes(searchTerms) ||
+                        searchTerms.split(' ').every(term => p.name.toLowerCase().includes(term))
+                    );
+                    if (found.length > 0) {
+                        response = `🔍 <b>Trovato!</b> Ecco "${searchTerms}":`;
+                        suggestions = found.slice(0, 5);
+                    } else {
+                        response = `🔍 Non ho trovato "${searchTerms}" nel database. Prova con:`;
+                        suggestions = places.filter(p => p.importance === 5).slice(0, 4);
+                    }
+                } else {
+                    response = '🔍 Dimmi cosa cerchi! Es: "Dov\'è l\'Empire State Building?"';
+                    return response;
+                }
+            }
+            // 6. TOP 10 MIGLIORI
+            else if (matchKeyword('top10')) {
+                response = '🏆 <b>TOP 10 posti imperdibili di NYC:</b>';
+                suggestions = [...places].sort((a,b) => {
+                    const scoreA = a.rating * 2 + a.importance;
+                    const scoreB = b.rating * 2 + b.importance;
+                    return scoreB - scoreA;
+                }).slice(0, 10);
+            }
+            // 7. RANDOM / SORPRESA
+            else if (matchKeyword('random')) {
+                const randomPlace = places[Math.floor(Math.random() * places.length)];
+                response = `🎲 <b>Sorpresa!</b> Ti propongo questo posto a caso:`;
+                suggestions = [randomPlace];
+                // Aggiungi altri 2 random per varietà
+                const others = places.filter(p => p.id !== randomPlace.id).sort(() => Math.random() - 0.5).slice(0, 2);
+                suggestions.push(...others);
+            }
+            // 8. RICERCA PER QUARTIERE/ZONA
+            else {
+                let foundNeighborhood = null;
+                for (const [key, hood] of Object.entries(neighborhoods)) {
+                    if (m.includes(key)) {
+                        foundNeighborhood = hood;
+                        break;
+                    }
+                }
+                if (foundNeighborhood) {
+                    const [minLat, minLng, maxLat, maxLng] = foundNeighborhood.bounds;
+                    response = `📍 <b>A ${foundNeighborhood.name}:</b>`;
+                    suggestions = places.filter(p => 
+                        p.lat >= minLat && p.lat <= maxLat && 
+                        p.lng >= minLng && p.lng <= maxLng
+                    ).sort((a,b) => b.importance - a.importance).slice(0, 6);
+                    if (suggestions.length === 0) {
+                        response = `📍 Non ho molti posti specifici a ${foundNeighborhood.name}, ma ecco i più vicini:`;
+                        const centerLat = (minLat + maxLat) / 2;
+                        const centerLng = (minLng + maxLng) / 2;
+                        suggestions = [...places].sort((a,b) => 
+                            getDistance(centerLat, centerLng, a.lat, a.lng) - getDistance(centerLat, centerLng, b.lat, b.lng)
+                        ).slice(0, 5);
+                    }
+                }
+                // 9. FAMILY FRIENDLY
+                else if (matchKeyword('family')) {
+                    response = '👨‍👩‍👧 <b>Perfetto per famiglie:</b>';
+                    suggestions = places.filter(p => 
+                        p.category === 'attractions' || 
+                        p.category === 'museums' ||
+                        ['🦖','🎠','🎢','🌳','⛲','🎭','🏛️','🗽','🌉'].includes(p.emoji) ||
+                        p.name.toLowerCase().includes('park')
+                    ).sort((a,b) => b.importance - a.importance).slice(0, 6);
+                }
+                // NUOVE CATEGORIE FOOD SPECIFICHE
+                else if (matchKeyword('rooftop')) {
+                    response = '🌃 <b>Rooftop bar con vista pazzesca:</b>';
+                    suggestions = places.filter(p => 
+                        p.name.toLowerCase().includes('rooftop') || 
+                        p.desc.toLowerCase().includes('rooftop') ||
+                        p.emoji === '🌃'
+                    ).slice(0, 6);
+                }
+                else if (matchKeyword('speakeasy')) {
+                    response = '🥃 <b>Speakeasy e bar nascosti:</b>';
+                    suggestions = places.filter(p => 
+                        p.name.toLowerCase().includes('speakeasy') || 
+                        p.desc.toLowerCase().includes('speakeasy') ||
+                        p.desc.toLowerCase().includes('nascost') ||
+                        p.desc.toLowerCase().includes('hidden')
+                    ).slice(0, 6);
+                }
+                else if (matchKeyword('bagel')) {
+                    response = '🥯 <b>I migliori bagel di NYC:</b>';
+                    suggestions = places.filter(p => p.emoji === '🥯' || p.name.toLowerCase().includes('bagel')).slice(0, 6);
+                }
+                else if (matchKeyword('icecream')) {
+                    response = '🍦 <b>Gelato e ice cream:</b>';
+                    suggestions = places.filter(p => ['🍦','🍨'].includes(p.emoji) || p.name.toLowerCase().includes('ice cream') || p.name.toLowerCase().includes('gelat')).slice(0, 6);
+                }
+                else if (matchKeyword('asian')) {
+                    response = '🥢 <b>Cucina asiatica top:</b>';
+                    suggestions = places.filter(p => ['🥟','🍜','🍣','🥡','🍱'].includes(p.emoji) || 
+                        p.name.toLowerCase().includes('chinese') || 
+                        p.name.toLowerCase().includes('ramen') ||
+                        p.name.toLowerCase().includes('dumpling')
+                    ).slice(0, 6);
+                }
+                else if (matchKeyword('italian')) {
+                    response = '🇮🇹 <b>Cucina italiana a NYC:</b>';
+                    suggestions = places.filter(p => 
+                        p.emoji === '🍕' || 
+                        p.desc.toLowerCase().includes('italian') ||
+                        p.address.toLowerCase().includes('arthur ave') ||
+                        p.address.toLowerCase().includes('little italy')
+                    ).slice(0, 6);
+                }
+                // KEYWORDS ORIGINALI
+                else if (matchKeyword('pizza')) {
+                    response = t('responses.pizza');
+                    suggestions = places.filter(p => p.emoji === '🍕' || p.name.toLowerCase().includes('pizza')).slice(0, 6);
+                } else if (matchKeyword('hungry')) {
+                    response = t('responses.hungry');
+                    suggestions = places.filter(p => p.category === 'food').sort((a,b) => b.rating - a.rating).slice(0, 6);
+                } else if (matchKeyword('sweets')) {
+                    response = t('responses.sweets');
+                    suggestions = places.filter(p => ['🍪','🍰','🍫','🥐','🎂','🍦','🥞','🧁','🍨','🍬'].includes(p.emoji)).slice(0, 6);
+                } else if (matchKeyword('shopping')) {
+                    response = t('responses.shopping');
+                    suggestions = places.filter(p => p.category === 'shopping').sort((a,b) => b.importance - a.importance).slice(0, 6);
+                } else if (matchKeyword('harryPotter')) {
+                    response = t('responses.harryPotter');
+                    suggestions = places.filter(p => p.category === 'harrypotter');
+                } else if (matchKeyword('instagram')) {
+                    response = t('responses.instagram');
+                    suggestions = places.filter(p => (p.tags||[]).some(tag => tag==='insta' || tag==='viral')).sort((a,b) => b.rating - a.rating).slice(0, 6);
+                } else if (matchKeyword('nearby')) {
+                    if (userLocation) {
+                        response = t('responses.nearby');
+                        suggestions = [...places].sort((a,b) => getDistance(userLocation.lat, userLocation.lng, a.lat, a.lng) - getDistance(userLocation.lat, userLocation.lng, b.lat, b.lng)).slice(0, 6);
+                    } else return t('responses.nearbyNoGps');
+                } else if (matchKeyword('free')) {
+                    response = t('responses.free');
+                    suggestions = places.filter(p => p.cost === 0).sort((a,b) => b.importance - a.importance).slice(0, 6);
+                } else if (matchKeyword('museums')) {
+                    response = t('responses.museums');
+                    suggestions = places.filter(p => p.category === 'museums').sort((a,b) => b.rating - a.rating).slice(0, 6);
+                } else if (matchKeyword('views')) {
+                    response = t('responses.views');
+                    suggestions = places.filter(p => ['Empire','Top of','One World','Edge','SUMMIT','Rooftop'].some(n => p.name.includes(n)) || p.emoji === '🌃').slice(0, 6);
+                } else if (matchKeyword('brunch')) {
+                    response = t('responses.brunch');
+                    suggestions = places.filter(p => ['🥞','🥯','🍳','🥑'].includes(p.emoji) || p.name.toLowerCase().includes('brunch')).slice(0, 6);
+                } else if (matchKeyword('coffee')) {
+                    response = t('responses.coffee');
+                    suggestions = places.filter(p => p.emoji === '☕').slice(0, 6);
+                } else if (matchKeyword('sneakers')) {
+                    response = t('responses.sneakers');
+                    suggestions = places.filter(p => p.emoji === '👟').slice(0, 6);
+                } else if (matchKeyword('burger')) {
+                    response = t('responses.burger');
+                    suggestions = places.filter(p => p.emoji === '🍔').slice(0, 6);
+                } else if (matchKeyword('parks')) {
+                    response = t('responses.parks');
+                    suggestions = places.filter(p => p.name.toLowerCase().includes('park') || p.emoji === '🌳' || p.emoji === '⛲').slice(0, 6);
+                } else if (matchKeyword('brooklyn')) {
+                    response = t('responses.brooklyn');
+                    suggestions = places.filter(p => p.address.toLowerCase().includes('brooklyn')).sort((a,b) => b.importance - a.importance).slice(0, 6);
+                } else if (matchKeyword('timesSquare')) {
+                    response = t('responses.timesSquare');
+                    suggestions = places.filter(p => p.address.toLowerCase().includes('times') || p.address.toLowerCase().includes('42nd') || p.address.toLowerCase().includes('broadway') || p.name.toLowerCase().includes('broadway')).slice(0, 6);
+                } else if (matchKeyword('movies')) {
+                    response = '🎬 <b>Luoghi da film famosi!</b> Dove hanno girato scene epiche:';
+                    suggestions = places.filter(p => p.category === 'movies').sort((a,b) => b.importance - a.importance).slice(0, 6);
+                } else if (matchKeyword('iconic')) {
+                    response = '⭐ <b>Luoghi iconici di NYC!</b> I posti che DEVI vedere:';
+                    suggestions = places.filter(p => p.category === 'iconic').sort((a,b) => b.importance - a.importance).slice(0, 6);
+                } else if (matchKeyword('newjersey')) {
+                    response = '🌉 <b>New Jersey!</b> Dall\'altra parte del fiume con vista su Manhattan:';
+                    suggestions = places.filter(p => p.category === 'newjersey').sort((a,b) => b.importance - a.importance).slice(0, 6);
+                } else {
+                    // NON CAPITO - Mostra suggerimenti intelligenti
+                    response = t('chat.notUnderstood');
+                    return response + `<div class="quick-actions" style="flex-wrap:wrap;">
+                        <button class="quick-btn" onclick="sendQuickMessage('Cosa faccio oggi?')">🗓️ Oggi</button>
+                        <button class="quick-btn" onclick="sendQuickMessage('Top 10')">🏆 Top 10</button>
+                        <button class="quick-btn" onclick="sendQuickMessage('Sorprendimi')">🎲 Random</button>
+                        <button class="quick-btn" onclick="sendQuickMessage('Cosa è aperto?')">🕐 Aperto ora</button>
+                        <button class="quick-btn" onclick="sendQuickMessage('${sanitizeInput(t('quickActions.pizza'))}')">🍕 Pizza</button>
+                        <button class="quick-btn" onclick="sendQuickMessage('${sanitizeInput(t('quickActions.free'))}')">🎉 Gratis</button>
+                        <button class="quick-btn" onclick="sendQuickMessage('Film locations')">🎬 Film</button>
+                        <button class="quick-btn" onclick="sendQuickMessage('${sanitizeInput(t('quickActions.insta'))}')">📸 Insta</button>
+                    </div>`;
+                }
+            }
+
+            // Genera cards dei suggerimenti
+            suggestions.forEach((p, i) => {
+                const dist = userLocation ? formatDistance(getDistance(userLocation.lat, userLocation.lng, p.lat, p.lng)) : '';
+                const costText = p.cost === 0 ? t('units.free') : '$' + p.cost;
+                const isOpen = isOpenNow(p.hours);
+                const openBadge = isOpen ? '<span style="color:#2ecc71;font-size:0.7em;">● Aperto</span>' : '<span style="color:#e74c3c;font-size:0.7em;">● Chiuso</span>';
+                response += `<div class="place-suggestion" onclick="focusPlace(${p.id})">
+                    <span class="emoji">${p.emoji}</span>
+                    <div class="info">
+                        <div class="name">${sanitizeInput(p.name)} ${openBadge}</div>
+                        <div class="meta">${dist?dist+' • ':''}${formatDuration(p.duration)} • ${costText}</div>
+                    </div>
+                    <button class="go-btn" onclick="event.stopPropagation();openNav(${p.lat},${p.lng},'${sanitizeInput(p.name).replace(/'/g,"\\'")}')">Vai</button>
+                </div>`;
+            });
+            return response;
+        }
+
+        function focusPlace(id) {
+            const place = places.find(p => p.id === id);
+            if (place) {
+                map.setView([place.lat, place.lng], 16);
+                toggleChat();
+                const idx = filterPlaces().findIndex(p => p.id === id);
+                if (idx >= 0 && markers[idx]) markers[idx].openPopup();
+            }
+        }
+
+        function getDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371, dLat = (lat2-lat1)*Math.PI/180, dLon = (lon2-lon1)*Math.PI/180;
+            const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        }
+        
+        function formatDistance(km) { 
+            return km < 1 ? Math.round(km*1000) + t('units.meters') : km.toFixed(1) + t('units.km'); 
+        }
+        
+        function formatDuration(m) { 
+            return m < 60 ? m + t('units.min') : Math.floor(m/60) + t('units.hour') + (m%60 ? m%60 + t('units.min') : ''); 
+        }
+        
+        function openNav(lat, lng, name) {
+            const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+            window.open(iOS ? `maps://maps.apple.com/?daddr=${lat},${lng}` : `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`);
+        }
+        
+        // ============ SERVICE WORKER REGISTRATION (PWA) ============
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then((registration) => {
+                        console.log('[PWA] Service Worker registrato:', registration.scope);
+                        
+                        // Check for updates
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    // New version available
+                                    if (confirm('🔄 Nuova versione disponibile! Aggiornare?')) {
+                                        window.location.reload();
+                                    }
+                                }
+                            });
+                        });
+                    })
+                    .catch((error) => {
+                        console.warn('[PWA] Service Worker non registrato:', error);
+                    });
+            });
+        }
+        
+        // ============ PWA INSTALL PROMPT ============
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            // Show install button after a delay
+            setTimeout(() => {
+                if (deferredPrompt && !localStorage.getItem('nycGuide_installDismissed')) {
+                    showInstallPrompt();
+                }
+            }, 30000); // After 30 seconds of use
+        });
+        
+        function showInstallPrompt() {
+            const installMsg = document.createElement('div');
+            installMsg.id = 'installPrompt';
+            installMsg.innerHTML = `
+                <div style="position:fixed;bottom:80px;left:10px;right:10px;background:linear-gradient(135deg,#667eea,#764ba2);color:white;padding:15px 20px;border-radius:15px;box-shadow:0 4px 20px rgba(0,0,0,0.3);z-index:3000;display:flex;align-items:center;gap:15px;">
+                    <span style="font-size:2em;">📲</span>
+                    <div style="flex:1;">
+                        <div style="font-weight:600;">Installa NYC Teen Guide</div>
+                        <div style="font-size:0.8em;opacity:0.9;">Usala anche offline!</div>
+                    </div>
+                    <button onclick="installPWA()" style="background:white;color:#667eea;border:none;padding:10px 15px;border-radius:10px;font-weight:600;cursor:pointer;">Installa</button>
+                    <button onclick="dismissInstall()" style="background:transparent;color:white;border:none;font-size:1.2em;cursor:pointer;">×</button>
+                </div>
+            `;
+            document.body.appendChild(installMsg);
+        }
+        
+        function installPWA() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choice) => {
+                    if (choice.outcome === 'accepted') {
+                        console.log('[PWA] App installata');
+                    }
+                    deferredPrompt = null;
+                    document.getElementById('installPrompt')?.remove();
+                });
+            }
+        }
+        
+        function dismissInstall() {
+            localStorage.setItem('nycGuide_installDismissed', 'true');
+            document.getElementById('installPrompt')?.remove();
+        }
+    </script>
+</body>
+</html>

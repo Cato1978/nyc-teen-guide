@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 390 844" width="390" height="844">
+  <!-- Phone Frame -->
+  <rect width="390" height="844" rx="40" fill="#1a1a1a"/>
+  <rect x="10" y="10" width="370" height="824" rx="32" fill="#f5f6fa"/>
+  
+  <!-- Status Bar -->
+  <rect x="10" y="10" width="370" height="50" rx="32" fill="url(#gradient1)"/>
+  <text x="30" y="40" fill="white" font-family="Arial" font-size="14">9:41</text>
+  <text x="320" y="40" fill="white" font-family="Arial" font-size="14">100% 🔋</text>
+  
+  <!-- Map Area (dimmed) -->
+  <rect x="10" y="60" width="370" height="600" fill="#e8f4e5" opacity="0.7"/>
+  
+  <!-- Street Grid -->
+  <line x1="10" y1="150" x2="380" y2="150" stroke="#ccc" stroke-width="2" opacity="0.5"/>
+  <line x1="10" y1="300" x2="380" y2="300" stroke="#ccc" stroke-width="2" opacity="0.5"/>
+  <line x1="10" y1="450" x2="380" y2="450" stroke="#ccc" stroke-width="2" opacity="0.5"/>
+  <line x1="130" y1="60" x2="130" y2="660" stroke="#ccc" stroke-width="2" opacity="0.5"/>
+  <line x1="260" y1="60" x2="260" y2="660" stroke="#ccc" stroke-width="2" opacity="0.5"/>
+  
+  <!-- Active Marker -->
+  <circle cx="195" cy="380" r="20" fill="#FF6B6B" stroke="white" stroke-width="3"/>
+  <text x="185" y="387" font-size="18">🏙️</text>
+  
+  <!-- POPUP -->
+  <rect x="30" y="150" width="330" height="320" rx="15" fill="white" filter="url(#shadow)"/>
+  
+  <!-- Popup Header -->
+  <text x="50" y="185" font-size="24">🏙️</text>
+  <text x="85" y="180" fill="#333" font-family="Arial" font-size="16" font-weight="bold">Empire State Building</text>
+  <rect x="260" y="165" width="50" height="20" rx="4" fill="#d4edda"/>
+  <text x="268" y="180" fill="#155724" font-family="Arial" font-size="10" font-weight="bold">GRATIS</text>
+  <text x="85" y="200" fill="#f39c12" font-family="Arial" font-size="12">⭐ 4.7 • 350m</text>
+  
+  <!-- Stats Row -->
+  <rect x="45" y="215" width="290" height="40" rx="8" fill="#f8f9fa"/>
+  <text x="60" y="240" fill="#333" font-family="Arial" font-size="12">⏱️ 90min</text>
+  <text x="145" y="240" fill="#333" font-family="Arial" font-size="12">💵 $44</text>
+  <text x="220" y="240" fill="#333" font-family="Arial" font-size="12">🕐 10:00-22:00</text>
+  
+  <!-- Description -->
+  <text x="45" y="280" fill="#666" font-family="Arial" font-size="12">💡 Vista mozzafiato su tutta Manhattan!</text>
+  <text x="55" y="295" fill="#666" font-family="Arial" font-size="12">Iconico grattacielo Art Deco del 1931.</text>
+  
+  <!-- Review -->
+  <rect x="45" y="310" width="290" height="50" rx="8" fill="#fff3cd"/>
+  <text x="55" y="330" fill="#856404" font-family="Arial" font-size="11" font-weight="bold">💬 Review:</text>
+  <text x="55" y="348" fill="#856404" font-family="Arial" font-size="11">"Di notte è MAGICO! Le luci della città..."</text>
+  
+  <!-- Pro Tip -->
+  <rect x="45" y="370" width="290" height="35" rx="8" fill="#d4edda"/>
+  <text x="55" y="392" fill="#155724" font-family="Arial" font-size="11">💡 Pro tip: Vai al tramonto per le foto migliori!</text>
+  
+  <!-- Metro -->
+  <text x="45" y="425" fill="#888" font-family="Arial" font-size="11">🚇 B, D, F, M, N, Q, R, W - 34th St</text>
+  
+  <!-- Button -->
+  <rect x="45" y="440" width="290" height="40" rx="10" fill="#667eea"/>
+  <text x="140" y="466" fill="white" font-family="Arial" font-size="14" font-weight="bold">🗺️ Portami qui!</text>
+  
+  <!-- Counter -->
+  <rect x="25" y="680" width="100" height="35" rx="17" fill="white" filter="url(#shadow)"/>
+  <text x="35" y="703" fill="#333" font-family="Arial" font-size="12" font-weight="bold">🗺️ 200 luoghi</text>
+  
+  <!-- Chat Header -->
+  <rect x="10" y="740" width="370" height="60" rx="20" fill="url(#gradient1)"/>
+  <circle cx="45" cy="770" r="18" fill="rgba(255,255,255,0.2)"/>
+  <text x="37" y="776" font-size="16">🤖</text>
+  <text x="70" y="763" fill="white" font-family="Arial" font-size="13" font-weight="bold">Guida NYC</text>
+  <text x="70" y="780" fill="rgba(255,255,255,0.8)" font-family="Arial" font-size="10">Chiedimi tutto!</text>
+  <text x="350" y="775" fill="white" font-size="18">▲</text>
+  
+  <!-- Home Indicator -->
+  <rect x="145" y="815" width="100" height="5" rx="2" fill="#333"/>
+  
+  <!-- Definitions -->
+  <defs>
+    <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea"/>
+      <stop offset="100%" style="stop-color:#764ba2"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+</svg>

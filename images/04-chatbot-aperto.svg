@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 390 844" width="390" height="844">
+  <!-- Phone Frame -->
+  <rect width="390" height="844" rx="40" fill="#1a1a1a"/>
+  <rect x="10" y="10" width="370" height="824" rx="32" fill="#f5f6fa"/>
+  
+  <!-- Status Bar -->
+  <rect x="10" y="10" width="370" height="50" rx="32" fill="url(#gradient1)"/>
+  <text x="30" y="40" fill="white" font-family="Arial" font-size="14">9:41</text>
+  <text x="320" y="40" fill="white" font-family="Arial" font-size="14">100% 🔋</text>
+  
+  <!-- Chat Header -->
+  <rect x="10" y="60" width="370" height="60" rx="0" fill="url(#gradient1)"/>
+  <circle cx="45" cy="90" r="20" fill="rgba(255,255,255,0.2)"/>
+  <text x="35" y="97" font-size="20">🤖</text>
+  <text x="75" y="83" fill="white" font-family="Arial" font-size="15" font-weight="bold">Guida NYC</text>
+  <text x="75" y="102" fill="rgba(255,255,255,0.8)" font-family="Arial" font-size="11">200 luoghi! Chiedimi tutto!</text>
+  <text x="355" y="95" fill="white" font-size="20">▼</text>
+  
+  <!-- Chat Messages Area -->
+  <rect x="10" y="120" width="370" height="600" fill="white"/>
+  
+  <!-- Bot Welcome Message -->
+  <rect x="20" y="135" width="280" height="140" rx="15" fill="#f0f0f0"/>
+  <text x="35" y="160" fill="#333" font-family="Arial" font-size="13">Ciao! 👋 Sono la tua guida per NYC</text>
+  <text x="35" y="180" fill="#333" font-family="Arial" font-size="13">con 200 luoghi! 🗽</text>
+  <text x="35" y="205" fill="#333" font-family="Arial" font-size="12">Chiedimi qualsiasi cosa:</text>
+  
+  <!-- Quick Actions -->
+  <rect x="35" y="220" width="60" height="24" rx="12" fill="white" stroke="#667eea"/>
+  <text x="43" y="237" fill="#667eea" font-family="Arial" font-size="10">🍕 Fame</text>
+  
+  <rect x="100" y="220" width="60" height="24" rx="12" fill="white" stroke="#667eea"/>
+  <text x="107" y="237" fill="#667eea" font-family="Arial" font-size="10">📍 Vicino</text>
+  
+  <rect x="165" y="220" width="55" height="24" rx="12" fill="white" stroke="#667eea"/>
+  <text x="173" y="237" fill="#667eea" font-family="Arial" font-size="10">🛍️ Shop</text>
+  
+  <rect x="225" y="220" width="55" height="24" rx="12" fill="white" stroke="#667eea"/>
+  <text x="233" y="237" fill="#667eea" font-family="Arial" font-size="10">📸 Insta</text>
+  
+  <rect x="35" y="250" width="45" height="24" rx="12" fill="white" stroke="#667eea"/>
+  <text x="43" y="267" fill="#667eea" font-family="Arial" font-size="10">⚡ HP</text>
+  
+  <rect x="85" y="250" width="60" height="24" rx="12" fill="white" stroke="#667eea"/>
+  <text x="93" y="267" fill="#667eea" font-family="Arial" font-size="10">🎉 Gratis</text>
+  
+  <!-- User Message -->
+  <rect x="180" y="300" width="180" height="35" rx="15" fill="#667eea"/>
+  <text x="200" y="323" fill="white" font-family="Arial" font-size="13">Pizza vicino a me! 🍕</text>
+  
+  <!-- Bot Response -->
+  <rect x="20" y="350" width="300" height="250" rx="15" fill="#f0f0f0"/>
+  <text x="35" y="375" fill="#333" font-family="Arial" font-size="13">🍕 Ecco le pizzerie più vicine:</text>
+  
+  <!-- Result Card 1 -->
+  <rect x="35" y="390" width="270" height="60" rx="10" fill="white" stroke="#eee"/>
+  <text x="50" y="412" font-size="18">🍕</text>
+  <text x="75" y="410" fill="#333" font-family="Arial" font-size="13" font-weight="bold">Joe's Pizza</text>
+  <text x="75" y="428" fill="#888" font-family="Arial" font-size="11">350m • 20min • $3</text>
+  <rect x="250" y="400" width="45" height="25" rx="6" fill="#667eea"/>
+  <text x="260" y="418" fill="white" font-family="Arial" font-size="10">Vai</text>
+  
+  <!-- Result Card 2 -->
+  <rect x="35" y="460" width="270" height="60" rx="10" fill="white" stroke="#eee"/>
+  <text x="50" y="482" font-size="18">🍕</text>
+  <text x="75" y="480" fill="#333" font-family="Arial" font-size="13" font-weight="bold">Prince Street Pizza</text>
+  <text x="75" y="498" fill="#888" font-family="Arial" font-size="11">500m • 25min • $4</text>
+  <rect x="250" y="470" width="45" height="25" rx="6" fill="#667eea"/>
+  <text x="260" y="488" fill="white" font-family="Arial" font-size="10">Vai</text>
+  
+  <!-- Result Card 3 -->
+  <rect x="35" y="530" width="270" height="60" rx="10" fill="white" stroke="#eee"/>
+  <text x="50" y="552" font-size="18">🍕</text>
+  <text x="75" y="550" fill="#333" font-family="Arial" font-size="13" font-weight="bold">Scarr's Pizza</text>
+  <text x="75" y="568" fill="#888" font-family="Arial" font-size="11">800m • 20min • $5</text>
+  <rect x="250" y="540" width="45" height="25" rx="6" fill="#667eea"/>
+  <text x="260" y="558" fill="white" font-family="Arial" font-size="10">Vai</text>
+  
+  <!-- Input Area -->
+  <rect x="10" y="720" width="370" height="70" fill="white"/>
+  <line x1="10" y1="720" x2="380" y2="720" stroke="#eee" stroke-width="1"/>
+  
+  <rect x="20" y="735" width="290" height="40" rx="20" fill="white" stroke="#ddd"/>
+  <text x="40" y="760" fill="#888" font-family="Arial" font-size="13">Scrivi qui...</text>
+  
+  <circle cx="345" cy="755" r="22" fill="#667eea"/>
+  <text x="337" y="762" fill="white" font-size="18">➤</text>
+  
+  <!-- Home Indicator -->
+  <rect x="145" y="805" width="100" height="5" rx="2" fill="#333"/>
+  
+  <!-- Definitions -->
+  <defs>
+    <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea"/>
+      <stop offset="100%" style="stop-color:#764ba2"/>
+    </linearGradient>
+  </defs>
+</svg>

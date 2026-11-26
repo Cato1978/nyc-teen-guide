@@ -1,0 +1,135 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="800" height="450">
+  <!-- Background -->
+  <rect width="800" height="450" fill="#f8f9fa"/>
+  
+  <!-- Title -->
+  <text x="400" y="35" fill="#333" font-family="Arial" font-size="22" font-weight="bold" text-anchor="middle">📅 Itinerario Consigliato - 3 Giorni a NYC</text>
+  
+  <!-- Day 1 -->
+  <rect x="20" y="60" width="250" height="370" rx="15" fill="white" filter="url(#shadow)"/>
+  <rect x="20" y="60" width="250" height="50" rx="15" fill="#667eea"/>
+  <text x="145" y="92" fill="white" font-family="Arial" font-size="18" font-weight="bold" text-anchor="middle">📍 GIORNO 1</text>
+  <text x="145" y="107" fill="rgba(255,255,255,0.9)" font-family="Arial" font-size="11" text-anchor="middle">Midtown Manhattan</text>
+  
+  <!-- Day 1 Stops -->
+  <circle cx="50" cy="140" r="15" fill="#fff3e6" stroke="#f39c12" stroke-width="2"/>
+  <text x="50" y="145" font-size="12" text-anchor="middle">1</text>
+  <text x="75" y="138" fill="#333" font-family="Arial" font-size="12" font-weight="bold">Times Square</text>
+  <text x="75" y="155" fill="#666" font-family="Arial" font-size="10">Mattina - 1h ✨</text>
+  
+  <line x1="50" y1="160" x2="50" y2="180" stroke="#ddd" stroke-width="2" stroke-dasharray="4,4"/>
+  
+  <circle cx="50" cy="195" r="15" fill="#fff3e6" stroke="#f39c12" stroke-width="2"/>
+  <text x="50" y="200" font-size="12" text-anchor="middle">2</text>
+  <text x="75" y="193" fill="#333" font-family="Arial" font-size="12" font-weight="bold">Top of the Rock</text>
+  <text x="75" y="210" fill="#666" font-family="Arial" font-size="10">Mezzogiorno - 1.5h 🏙️</text>
+  
+  <line x1="50" y1="215" x2="50" y2="235" stroke="#ddd" stroke-width="2" stroke-dasharray="4,4"/>
+  
+  <circle cx="50" cy="250" r="15" fill="#fff3e6" stroke="#f39c12" stroke-width="2"/>
+  <text x="50" y="255" font-size="12" text-anchor="middle">3</text>
+  <text x="75" y="248" fill="#333" font-family="Arial" font-size="12" font-weight="bold">Central Park</text>
+  <text x="75" y="265" fill="#666" font-family="Arial" font-size="10">Pomeriggio - 3h 🌳</text>
+  
+  <line x1="50" y1="270" x2="50" y2="290" stroke="#ddd" stroke-width="2" stroke-dasharray="4,4"/>
+  
+  <circle cx="50" cy="305" r="15" fill="#e8f4e5" stroke="#2ecc71" stroke-width="2"/>
+  <text x="50" y="310" font-size="12" text-anchor="middle">🍕</text>
+  <text x="75" y="303" fill="#333" font-family="Arial" font-size="12" font-weight="bold">Joe's Pizza</text>
+  <text x="75" y="320" fill="#666" font-family="Arial" font-size="10">Cena - $3 slice!</text>
+  
+  <!-- Day 1 Map Mini -->
+  <rect x="35" y="345" width="220" height="70" rx="8" fill="#e8f4e5"/>
+  <rect x="80" y="355" width="80" height="30" rx="4" fill="#a8d5a2"/>
+  <text x="120" y="373" fill="#2d5a27" font-family="Arial" font-size="8" text-anchor="middle">Central Park</text>
+  <circle cx="60" cy="400" r="6" fill="#e74c3c"/>
+  <circle cx="120" cy="360" r="6" fill="#3498db"/>
+  <circle cx="180" cy="380" r="6" fill="#f39c12"/>
+  
+  <!-- Day 2 -->
+  <rect x="285" y="60" width="250" height="370" rx="15" fill="white" filter="url(#shadow)"/>
+  <rect x="285" y="60" width="250" height="50" rx="15" fill="#3498db"/>
+  <text x="410" y="92" fill="white" font-family="Arial" font-size="18" font-weight="bold" text-anchor="middle">📍 GIORNO 2</text>
+  <text x="410" y="107" fill="rgba(255,255,255,0.9)" font-family="Arial" font-size="11" text-anchor="middle">Brooklyn</text>
+  
+  <!-- Day 2 Stops -->
+  <circle cx="315" cy="140" r="15" fill="#fff3e6" stroke="#f39c12" stroke-width="2"/>
+  <text x="315" y="145" font-size="12" text-anchor="middle">1</text>
+  <text x="340" y="138" fill="#333" font-family="Arial" font-size="12" font-weight="bold">Brooklyn Bridge</text>
+  <text x="340" y="155" fill="#666" font-family="Arial" font-size="10">Mattina presto - 1h 🌉</text>
+  
+  <line x1="315" y1="160" x2="315" y2="180" stroke="#ddd" stroke-width="2" stroke-dasharray="4,4"/>
+  
+  <circle cx="315" cy="195" r="15" fill="#fff3e6" stroke="#f39c12" stroke-width="2"/>
+  <text x="315" y="200" font-size="12" text-anchor="middle">2</text>
+  <text x="340" y="193" fill="#333" font-family="Arial" font-size="12" font-weight="bold">DUMBO</text>
+  <text x="340" y="210" fill="#666" font-family="Arial" font-size="10">Foto iconiche! 📸</text>
+  
+  <line x1="315" y1="215" x2="315" y2="235" stroke="#ddd" stroke-width="2" stroke-dasharray="4,4"/>
+  
+  <circle cx="315" cy="250" r="15" fill="#fff3e6" stroke="#f39c12" stroke-width="2"/>
+  <text x="315" y="255" font-size="12" text-anchor="middle">3</text>
+  <text x="340" y="248" fill="#333" font-family="Arial" font-size="12" font-weight="bold">Williamsburg</text>
+  <text x="340" y="265" fill="#666" font-family="Arial" font-size="10">Shopping vintage 🛍️</text>
+  
+  <line x1="315" y1="270" x2="315" y2="290" stroke="#ddd" stroke-width="2" stroke-dasharray="4,4"/>
+  
+  <circle cx="315" cy="305" r="15" fill="#e8f4e5" stroke="#2ecc71" stroke-width="2"/>
+  <text x="315" y="310" font-size="12" text-anchor="middle">🍔</text>
+  <text x="340" y="303" fill="#333" font-family="Arial" font-size="12" font-weight="bold">Shake Shack</text>
+  <text x="340" y="320" fill="#666" font-family="Arial" font-size="10">Cena - Best burger!</text>
+  
+  <!-- Day 2 Map Mini -->
+  <rect x="300" y="345" width="220" height="70" rx="8" fill="#b8d4e8"/>
+  <rect x="380" y="360" width="60" height="40" rx="4" fill="#c9e0c5"/>
+  <text x="410" y="383" fill="#2d5a27" font-family="Arial" font-size="7" text-anchor="middle">Brooklyn</text>
+  <line x1="320" y1="380" x2="380" y2="370" stroke="#e74c3c" stroke-width="3"/>
+  <circle cx="410" cy="385" r="6" fill="#f39c12"/>
+  
+  <!-- Day 3 -->
+  <rect x="550" y="60" width="230" height="370" rx="15" fill="white" filter="url(#shadow)"/>
+  <rect x="550" y="60" width="230" height="50" rx="15" fill="#9b59b6"/>
+  <text x="665" y="92" fill="white" font-family="Arial" font-size="18" font-weight="bold" text-anchor="middle">📍 GIORNO 3</text>
+  <text x="665" y="107" fill="rgba(255,255,255,0.9)" font-family="Arial" font-size="11" text-anchor="middle">Chelsea + HP</text>
+  
+  <!-- Day 3 Stops -->
+  <circle cx="580" cy="140" r="15" fill="#f3e8ff" stroke="#9b59b6" stroke-width="2"/>
+  <text x="580" y="145" font-size="12" text-anchor="middle">⚡</text>
+  <text x="605" y="138" fill="#333" font-family="Arial" font-size="12" font-weight="bold">Harry Potter Store</text>
+  <text x="605" y="155" fill="#666" font-family="Arial" font-size="10">Mattina - 2h 🪄</text>
+  
+  <line x1="580" y1="160" x2="580" y2="180" stroke="#ddd" stroke-width="2" stroke-dasharray="4,4"/>
+  
+  <circle cx="580" cy="195" r="15" fill="#fff3e6" stroke="#f39c12" stroke-width="2"/>
+  <text x="580" y="200" font-size="12" text-anchor="middle">2</text>
+  <text x="605" y="193" fill="#333" font-family="Arial" font-size="12" font-weight="bold">High Line</text>
+  <text x="605" y="210" fill="#666" font-family="Arial" font-size="10">Passeggiata - 1.5h 🌿</text>
+  
+  <line x1="580" y1="215" x2="580" y2="235" stroke="#ddd" stroke-width="2" stroke-dasharray="4,4"/>
+  
+  <circle cx="580" cy="250" r="15" fill="#fff3e6" stroke="#f39c12" stroke-width="2"/>
+  <text x="580" y="255" font-size="12" text-anchor="middle">3</text>
+  <text x="605" y="248" fill="#333" font-family="Arial" font-size="12" font-weight="bold">Chelsea Market</text>
+  <text x="605" y="265" fill="#666" font-family="Arial" font-size="10">Food hall - 1.5h 🍜</text>
+  
+  <line x1="580" y1="270" x2="580" y2="290" stroke="#ddd" stroke-width="2" stroke-dasharray="4,4"/>
+  
+  <circle cx="580" cy="305" r="15" fill="#e8f4e5" stroke="#2ecc71" stroke-width="2"/>
+  <text x="580" y="310" font-size="12" text-anchor="middle">🍪</text>
+  <text x="605" y="303" fill="#333" font-family="Arial" font-size="12" font-weight="bold">Levain Bakery</text>
+  <text x="605" y="320" fill="#666" font-family="Arial" font-size="10">Cookie gigante!</text>
+  
+  <!-- Day 3 Map Mini -->
+  <rect x="565" y="345" width="200" height="70" rx="8" fill="#e8f4e5"/>
+  <line x1="580" y1="360" x2="580" y2="400" stroke="#2ecc71" stroke-width="4"/>
+  <text x="600" y="380" fill="#2d5a27" font-family="Arial" font-size="8">High Line</text>
+  <circle cx="650" cy="370" r="6" fill="#9b59b6"/>
+  <circle cx="680" cy="390" r="6" fill="#f39c12"/>
+  
+  <!-- Definitions -->
+  <defs>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="115%">
+      <feDropShadow dx="0" dy="3" stdDeviation="5" flood-opacity="0.1"/>
+    </filter>
+  </defs>
+</svg>
