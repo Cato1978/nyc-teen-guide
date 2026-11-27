@@ -122,19 +122,23 @@
         .lang-option:last-child { border-bottom: none; }
         .lang-option:hover { background: #f0f0f0; }
         .lang-option.active { background: var(--primary); color: white; }
-        .filter-chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 12px; border-top: 1px solid #eee; }
-        .filter-chip { flex-shrink: 0; padding: 6px 12px; border-radius: 15px; background: #f0f0f0; font-size: 0.75em; font-weight: 600; cursor: pointer; transition: all 0.3s; }
-        .filter-chip.active { background: var(--primary); color: white; }
-        .filter-chip[data-cat="attractions"].active { background: var(--attractions); }
-        .filter-chip[data-cat="museums"].active { background: var(--museums); }
-        .filter-chip[data-cat="harrypotter"].active { background: var(--harrypotter); }
-        .filter-chip[data-cat="food"].active { background: var(--food); }
-        .filter-chip[data-cat="shopping"].active { background: var(--shopping); }
-        .filter-chip[data-cat="movies"].active { background: var(--movies); }
-        .filter-chip[data-cat="iconic"].active { background: var(--iconic); }
-        .filter-chip[data-cat="newjersey"].active { background: var(--newjersey); }
-        .time-filter { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-top: 1px solid #eee; background: #f8f9fa; font-size: 0.8em; }
-        .time-select { flex: 1; padding: 6px 10px; border: 1px solid #ddd; border-radius: 8px; font-family: inherit; font-size: 0.9em; }
+        .filter-chips { display: flex; justify-content: center; gap: 8px; padding: 10px 12px; border-top: 1px solid #eee; }
+        .filter-chip { width: 42px; height: 42px; border-radius: 50%; background: #f0f0f0; font-size: 1.2em; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; position: relative; border: 2px solid transparent; }
+        .filter-chip:hover { transform: scale(1.1); background: #e8e8e8; }
+        .filter-chip.active { border-color: var(--primary); background: white; box-shadow: 0 2px 8px rgba(102,126,234,0.3); }
+        .filter-chip[data-cat="attractions"].active { border-color: var(--attractions); box-shadow: 0 2px 8px rgba(255,107,107,0.3); }
+        .filter-chip[data-cat="museums"].active { border-color: var(--museums); box-shadow: 0 2px 8px rgba(52,152,219,0.3); }
+        .filter-chip[data-cat="harrypotter"].active { border-color: var(--harrypotter); box-shadow: 0 2px 8px rgba(155,89,182,0.3); }
+        .filter-chip[data-cat="food"].active { border-color: var(--food); box-shadow: 0 2px 8px rgba(243,156,18,0.3); }
+        .filter-chip[data-cat="shopping"].active { border-color: var(--shopping); box-shadow: 0 2px 8px rgba(26,188,156,0.3); }
+        .filter-chip[data-cat="movies"].active { border-color: var(--movies); box-shadow: 0 2px 8px rgba(233,30,99,0.3); }
+        .filter-chip[data-cat="iconic"].active { border-color: var(--iconic); box-shadow: 0 2px 8px rgba(255,87,34,0.3); }
+        .filter-chip[data-cat="newjersey"].active { border-color: var(--newjersey); box-shadow: 0 2px 8px rgba(0,188,212,0.3); }
+        .filter-chip .filter-tooltip { display: none; position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 6px 12px; border-radius: 8px; font-size: 0.65em; white-space: nowrap; z-index: 1000; font-weight: 600; }
+        .filter-chip .filter-tooltip::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border: 6px solid transparent; border-top-color: #333; }
+        .filter-chip:hover .filter-tooltip { display: block; }
+        .time-filter { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 6px 12px; border-top: 1px solid #eee; background: #f8f9fa; font-size: 0.75em; }
+        .time-select { padding: 5px 10px; border: 1px solid #ddd; border-radius: 8px; font-family: inherit; font-size: 1em; background: white; }
         .float-buttons { position: fixed; right: 10px; bottom: 100px; z-index: 999; display: flex; flex-direction: column; gap: 8px; }
         .float-btn { width: 50px; height: 50px; border-radius: 50%; border: none; background: white; box-shadow: 0 2px 15px rgba(0,0,0,0.2); font-size: 1.4em; cursor: pointer; }
         .float-btn:active { transform: scale(0.95); }
@@ -155,9 +159,16 @@
         .message { max-width: 85%; padding: 10px 14px; border-radius: 15px; font-size: 0.9em; line-height: 1.4; }
         .message.bot { background: #f0f0f0; align-self: flex-start; border-bottom-left-radius: 5px; }
         .message.user { background: var(--primary); color: white; align-self: flex-end; border-bottom-right-radius: 5px; }
-        .place-suggestion { display: flex; align-items: center; gap: 10px; cursor: pointer; background: white; border-radius: 10px; padding: 10px; margin-top: 8px; border: 1px solid #eee; }
+        .place-suggestion { display: flex; align-items: center; gap: 10px; cursor: pointer; background: white; border-radius: 10px; padding: 10px; margin-top: 8px; border: 1px solid #eee; position: relative; }
         .place-suggestion:hover { background: #f8f9fa; }
         .place-suggestion .emoji { font-size: 1.5em; }
+        .place-tooltip { display: none; position: absolute; bottom: calc(100% + 5px); left: 0; right: 0; background: linear-gradient(135deg, #2c3e50, #34495e); color: white; padding: 14px; border-radius: 12px; font-size: 0.82em; z-index: 1000; box-shadow: 0 6px 20px rgba(0,0,0,0.3); pointer-events: none; }
+        .place-tooltip::after { content: ''; position: absolute; top: 100%; left: 25px; border: 10px solid transparent; border-top-color: #34495e; }
+        .place-suggestion:hover .place-tooltip, .place-suggestion:focus .place-tooltip, .place-suggestion.touch-active .place-tooltip { display: block; }
+        .place-tooltip .tooltip-title { font-weight: 700; margin-bottom: 8px; color: #fff; font-size: 1.1em; display: flex; align-items: center; gap: 8px; }
+        .place-tooltip .tooltip-desc { color: #ecf0f1; margin-bottom: 10px; line-height: 1.5; }
+        .place-tooltip .tooltip-tip { color: #2ecc71; font-style: italic; background: rgba(46,204,113,0.15); padding: 6px 10px; border-radius: 6px; margin-bottom: 8px; }
+        .place-tooltip .tooltip-address { color: #bdc3c7; font-size: 0.9em; display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
         .itinerary-themes { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
         .theme-btn { display: flex; align-items: center; gap: 12px; padding: 12px 15px; background: white; border: 2px solid #eee; border-radius: 12px; cursor: pointer; transition: all 0.2s; }
         .theme-btn:hover { border-color: var(--primary); background: #f8f9fa; }
@@ -398,24 +409,24 @@
                 <button class="search-btn settings-btn" onclick="toggleSettings()" title="Settings">⚙️</button>
             </div>
             <div class="filter-chips" id="filterChips">
-                <div class="filter-chip active" data-cat="all" onclick="toggleFilter('all')">🗽 <span data-i18n="filters.all">All</span></div>
-                <div class="filter-chip" data-cat="attractions" onclick="toggleFilter('attractions')">🎢 <span data-i18n="filters.attractions">Attractions</span></div>
-                <div class="filter-chip" data-cat="museums" onclick="toggleFilter('museums')">🏛️ <span data-i18n="filters.museums">Museums</span></div>
-                <div class="filter-chip" data-cat="harrypotter" onclick="toggleFilter('harrypotter')">⚡ <span data-i18n="filters.harrypotter">Harry Potter</span></div>
-                <div class="filter-chip" data-cat="food" onclick="toggleFilter('food')">🍕 <span data-i18n="filters.food">Food</span></div>
-                <div class="filter-chip" data-cat="shopping" onclick="toggleFilter('shopping')">🛍️ <span data-i18n="filters.shopping">Shop</span></div>
-                <div class="filter-chip" data-cat="movies" onclick="toggleFilter('movies')">🎬 <span data-i18n="filters.movies">Movies</span></div>
-                <div class="filter-chip" data-cat="iconic" onclick="toggleFilter('iconic')">⭐ <span data-i18n="filters.iconic">Iconic</span></div>
-                <div class="filter-chip" data-cat="newjersey" onclick="toggleFilter('newjersey')">🌉 <span data-i18n="filters.newjersey">NJ</span></div>
+                <div class="filter-chip active" data-cat="all" onclick="toggleFilter('all')">🗽<span class="filter-tooltip" data-i18n="filters.all">All</span></div>
+                <div class="filter-chip" data-cat="attractions" onclick="toggleFilter('attractions')">🎢<span class="filter-tooltip" data-i18n="filters.attractions">Attractions</span></div>
+                <div class="filter-chip" data-cat="museums" onclick="toggleFilter('museums')">🏛️<span class="filter-tooltip" data-i18n="filters.museums">Museums</span></div>
+                <div class="filter-chip" data-cat="harrypotter" onclick="toggleFilter('harrypotter')">⚡<span class="filter-tooltip" data-i18n="filters.harrypotter">Harry Potter</span></div>
+                <div class="filter-chip" data-cat="food" onclick="toggleFilter('food')">🍕<span class="filter-tooltip" data-i18n="filters.food">Food</span></div>
+                <div class="filter-chip" data-cat="shopping" onclick="toggleFilter('shopping')">🛍️<span class="filter-tooltip" data-i18n="filters.shopping">Shop</span></div>
+                <div class="filter-chip" data-cat="movies" onclick="toggleFilter('movies')">🎬<span class="filter-tooltip" data-i18n="filters.movies">Movies</span></div>
+                <div class="filter-chip" data-cat="iconic" onclick="toggleFilter('iconic')">⭐<span class="filter-tooltip" data-i18n="filters.iconic">Iconic</span></div>
+                <div class="filter-chip" data-cat="newjersey" onclick="toggleFilter('newjersey')">🌉<span class="filter-tooltip" data-i18n="filters.newjersey">NJ</span></div>
             </div>
             <div class="time-filter">
-                <span>⏱️ <span data-i18n="time.label">Ho:</span></span>
+                <span>⏱️</span>
                 <select class="time-select" id="timeSelect" onchange="filterByTime()">
-                    <option value="0" data-i18n="time.allTime">Tutto il tempo</option>
-                    <option value="30" data-i18n="time.30min">30 minuti</option>
-                    <option value="60" data-i18n="time.1hour">1 ora</option>
-                    <option value="120" data-i18n="time.2hours">2 ore</option>
-                    <option value="180" data-i18n="time.halfDay">Mezza giornata</option>
+                    <option value="0" data-i18n="time.allTime">Any time</option>
+                    <option value="30" data-i18n="time.30min">30 min</option>
+                    <option value="60" data-i18n="time.1hour">1 hour</option>
+                    <option value="120" data-i18n="time.2hours" selected>2 hours</option>
+                    <option value="180" data-i18n="time.halfDay">Half day</option>
                 </select>
             </div>
         </div>
@@ -1066,6 +1077,26 @@ Per revocare il consenso: Impostazioni → Cancella tutti i dati`);
                 hideSearchAutocomplete();
             }
         });
+        
+        // Touch support for tooltips on mobile
+        document.addEventListener('touchstart', function(e) {
+            // Remove touch-active from all suggestions
+            document.querySelectorAll('.place-suggestion.touch-active').forEach(el => {
+                el.classList.remove('touch-active');
+            });
+            // Add touch-active to tapped suggestion
+            const suggestion = e.target.closest('.place-suggestion');
+            if (suggestion && !e.target.closest('.go-btn')) {
+                suggestion.classList.add('touch-active');
+            }
+        }, { passive: true });
+        
+        // Hide tooltip on scroll
+        document.addEventListener('scroll', function() {
+            document.querySelectorAll('.place-suggestion.touch-active').forEach(el => {
+                el.classList.remove('touch-active');
+            });
+        }, { passive: true, capture: true });
 
         async function searchAddress() {
             hideSearchAutocomplete();
@@ -1961,11 +1992,21 @@ Per revocare il consenso: Impostazioni → Cancella tutti i dati`);
                 const openText = currentLang === 'en' ? 'Open' : currentLang === 'es' ? 'Abierto' : currentLang === 'fr' ? 'Ouvert' : currentLang === 'de' ? 'Offen' : 'Aperto';
                 const closedText = currentLang === 'en' ? 'Closed' : currentLang === 'es' ? 'Cerrado' : currentLang === 'fr' ? 'Fermé' : currentLang === 'de' ? 'Geschlossen' : 'Chiuso';
                 const openBadge = isOpen ? `<span style="color:#2ecc71;font-size:0.7em;">● ${openText}</span>` : `<span style="color:#e74c3c;font-size:0.7em;">● ${closedText}</span>`;
-                response += `<div class="place-suggestion" onclick="focusPlace(${p.id})">
+                
+                // Tooltip with more info
+                const tooltipHtml = `<div class="place-tooltip">
+                    <div class="tooltip-title">${p.emoji} ${sanitizeInput(p.name)}</div>
+                    <div class="tooltip-desc">${sanitizeInput(p.desc || 'A must-see place in NYC!')}</div>
+                    ${p.tip ? `<div class="tooltip-tip">💡 ${sanitizeInput(p.tip)}</div>` : ''}
+                    <div class="tooltip-address">📍 ${sanitizeInput(p.address)} • ⏰ ${p.hours}</div>
+                </div>`;
+                
+                response += `<div class="place-suggestion" onclick="focusPlace(${p.id})" tabindex="0" title="Tap for details">
+                    ${tooltipHtml}
                     <span class="emoji">${p.emoji}</span>
                     <div class="info">
                         <div class="name">${sanitizeInput(p.name)} ${openBadge}</div>
-                        <div class="meta">${dist?dist+' • ':''}${formatDuration(p.duration)} • ${costText}</div>
+                        <div class="meta">${dist?dist+' • ':''}${formatDuration(p.duration)} • ${costText} <span style="opacity:0.5">• ℹ️ hover for tips</span></div>
                     </div>
                     <button class="go-btn" onclick="event.stopPropagation();openNav(${p.lat},${p.lng},'${sanitizeInput(p.name).replace(/'/g,"\\'")}')">Go</button>
                 </div>`;

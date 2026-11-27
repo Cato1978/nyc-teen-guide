@@ -26,9 +26,9 @@
     "newjersey": "NJ"
   },
   "time": {
-    "label": "I have:",
-    "allTime": "All the time",
-    "30min": "30 minutes",
+    "label": "Time:",
+    "allTime": "Any time",
+    "30min": "30 min",
     "1hour": "1 hour",
     "2hours": "2 hours",
     "halfDay": "Half day"
