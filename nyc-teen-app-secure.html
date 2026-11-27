@@ -1160,27 +1160,30 @@ Per revocare il consenso: Impostazioni → Cancella tutti i dati`);
             sendMessage();
         }
         
-        // Autocomplete suggestions data
+        // Autocomplete suggestions data - ordered by popularity/variety
         const autocompletePhrases = [
+            // Most popular first (shown when input is empty)
             { icon: '📅', text: 'Plan my 3-day trip', category: 'trip' },
-            { icon: '📅', text: 'Plan my 2-day NYC weekend', category: 'trip' },
-            { icon: '⚡', text: 'Harry Potter 3-day tour', category: 'trip' },
-            { icon: '👨‍👩‍👧', text: 'Family trip 3 days', category: 'trip' },
             { icon: '⚡', text: 'Harry Potter spots', category: 'harrypotter' },
             { icon: '🗓️', text: 'What should I do today?', category: 'itinerary' },
             { icon: '🍕', text: 'Best pizza in NYC', category: 'food' },
+            { icon: '📸', text: 'Instagram photo spots', category: 'insta' },
+            { icon: '🆓', text: 'Free things to do', category: 'free' },
+            { icon: '🎬', text: 'Movie filming locations', category: 'movies' },
+            { icon: '📍', text: 'What\'s nearby?', category: 'nearby' },
+            { icon: '🗽', text: 'Statue of Liberty', category: 'attractions' },
+            { icon: '🛍️', text: 'Shopping spots', category: 'shopping' },
+            { icon: '🌃', text: 'Best views of NYC', category: 'insta' },
+            { icon: '🎲', text: 'Surprise me!', category: 'random' },
+            { icon: '👨‍👩‍👧', text: 'Family trip 3 days', category: 'trip' },
+            { icon: '🏛️', text: 'Best museums', category: 'museums' },
+            { icon: '🌧️', text: 'Indoor activities (rainy day)', category: 'rain' },
+            // Secondary suggestions (shown when searching)
+            { icon: '📅', text: 'Plan my 2-day NYC weekend', category: 'trip' },
+            { icon: '⚡', text: 'Harry Potter 3-day tour', category: 'trip' },
             { icon: '🍔', text: 'Where to eat burgers?', category: 'food' },
             { icon: '🍦', text: 'Best ice cream', category: 'food' },
             { icon: '🥯', text: 'Famous bagels', category: 'food' },
-            { icon: '📸', text: 'Instagram photo spots', category: 'insta' },
-            { icon: '🆓', text: 'Free things to do', category: 'free' },
-            { icon: '📍', text: 'What\'s nearby?', category: 'nearby' },
-            { icon: '🎬', text: 'Movie filming locations', category: 'movies' },
-            { icon: '🎲', text: 'Surprise me!', category: 'random' },
-            { icon: '🏛️', text: 'Best museums', category: 'museums' },
-            { icon: '🛍️', text: 'Shopping spots', category: 'shopping' },
-            { icon: '🌧️', text: 'Indoor activities (rainy day)', category: 'rain' },
-            { icon: '🗽', text: 'Statue of Liberty', category: 'attractions' },
             { icon: '🌉', text: 'Brooklyn Bridge', category: 'attractions' },
             { icon: '🏙️', text: 'Times Square', category: 'attractions' },
             { icon: '🌳', text: 'Central Park', category: 'attractions' },
@@ -1188,14 +1191,17 @@ Per revocare il consenso: Impostazioni → Cancella tutti i dati`);
             { icon: '🏀', text: 'NBA Store', category: 'shopping' },
             { icon: '🎮', text: 'Nintendo Store', category: 'shopping' },
             { icon: '📚', text: 'Bookstores', category: 'shopping' },
-            { icon: '🌃', text: 'Best views of NYC', category: 'insta' },
             { icon: '☕', text: 'Friends apartment', category: 'movies' },
             { icon: '🕷️', text: 'Spider-Man locations', category: 'movies' },
             { icon: '🏠', text: 'Home Alone 2 spots', category: 'movies' },
             { icon: '🚇', text: 'SoHo neighborhood', category: 'area' },
             { icon: '🌉', text: 'Brooklyn DUMBO', category: 'area' },
             { icon: '🏮', text: 'Chinatown food', category: 'area' },
-            { icon: '💵', text: 'Cheap eats under $15', category: 'budget' }
+            { icon: '💵', text: 'Cheap eats under $15', category: 'budget' },
+            { icon: '🍩', text: 'Best donuts', category: 'food' },
+            { icon: '☕', text: 'Best coffee shops', category: 'food' },
+            { icon: '🌆', text: 'Rooftop bars with views', category: 'insta' },
+            { icon: '🎪', text: 'Things to do at night', category: 'night' }
         ];
         
         let selectedAutocompleteIndex = -1;
@@ -1208,13 +1214,13 @@ Per revocare il consenso: Impostazioni → Cancella tutti i dati`);
             // Filter suggestions based on input
             let filtered;
             if (query.length === 0) {
-                // Show popular suggestions when empty
-                filtered = autocompletePhrases.slice(0, 8);
+                // Show all popular suggestions when empty (scrollable list)
+                filtered = autocompletePhrases.slice(0, 15);
             } else {
                 filtered = autocompletePhrases.filter(p => 
                     p.text.toLowerCase().includes(query) || 
                     p.category.includes(query)
-                ).slice(0, 6);
+                ).slice(0, 10);
             }
             
             if (filtered.length === 0) {
