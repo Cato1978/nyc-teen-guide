@@ -98,9 +98,9 @@
         .data-btn:hover { background: #e74c3c; color: white; }
         
         .search-overlay { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; padding: 10px; padding-top: max(10px, env(safe-area-inset-top)); }
-        .search-container { background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); overflow: hidden; }
-        .search-box { display: flex; align-items: center; padding: 10px 12px; gap: 8px; }
-        .search-input { flex: 1; border: none; font-size: 0.95em; font-family: inherit; outline: none; background: transparent; }
+        .search-container { background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); overflow: visible; }
+        .search-box { display: flex; align-items: center; padding: 10px 12px; gap: 8px; position: relative; }
+        .search-input { flex: 1; border: none; font-size: 0.95em; font-family: inherit; outline: none; background: transparent; min-width: 0; }
         .search-autocomplete { position: absolute; top: 100%; left: 0; right: 0; background: white; border-radius: 0 0 16px 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); max-height: 300px; overflow-y: auto; display: none; z-index: 1001; }
         .search-autocomplete.show { display: block; }
         .search-autocomplete-item { padding: 12px 15px; cursor: pointer; font-size: 0.9em; border-bottom: 1px solid #f0f0f0; display: flex; align-items: center; gap: 12px; }
@@ -112,14 +112,13 @@
         .search-autocomplete-item .address { font-size: 0.8em; color: #888; }
         .search-autocomplete-item.place-result { border-left: 3px solid var(--primary); }
         .search-autocomplete-item.address-result { border-left: 3px solid #2ecc71; }
-        .search-btn { background: var(--primary); color: white; border: none; width: 38px; height: 38px; border-radius: 10px; font-size: 1.1em; cursor: pointer; flex-shrink: 0; }
+        .search-btn { background: var(--primary); color: white; border: none; width: 36px; height: 36px; border-radius: 10px; font-size: 1em; cursor: pointer; flex-shrink: 0; }
         .gps-btn { background: #2ecc71; }
-        .settings-btn { background: #f0f0f0; border: none; color: #666; font-size: 1em; }
+        .settings-btn { background: #f0f0f0; border: none; color: #666; font-size: 0.95em; }
         .settings-btn:hover { background: #e0e0e0; }
-        .lang-btn { background: #f0f0f0; color: #333; border: none; font-size: 0.8em; font-weight: bold; cursor: pointer; position: relative; min-width: 38px; }
+        .lang-btn { background: #f0f0f0; color: #333; border: none; font-size: 0.75em; font-weight: bold; cursor: pointer; min-width: 36px; }
         .lang-btn:hover { background: #e0e0e0; }
-        .search-box { position: relative; }
-        .lang-dropdown { position: absolute; top: 50px; right: 40px; background: white; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); overflow: hidden; display: none; z-index: 2000; min-width: 140px; }
+        .lang-dropdown { position: absolute; top: 100%; right: 0; margin-top: 5px; background: white; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); overflow: hidden; display: none; z-index: 2000; min-width: 150px; }
         .lang-dropdown.show { display: block; }
         .lang-option { display: flex; align-items: center; gap: 10px; padding: 10px 15px; cursor: pointer; font-size: 0.9em; border-bottom: 1px solid #eee; }
         .lang-option:last-child { border-bottom: none; }
