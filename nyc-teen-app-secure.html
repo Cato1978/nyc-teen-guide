@@ -464,13 +464,13 @@
         </div>
         <div class="chat-body">
             <div class="quick-actions" id="quickActions">
+                <button class="quick-btn" onclick="quickAsk('📅 Plan my 3-day trip')">📅 3-Day Trip</button>
                 <button class="quick-btn" onclick="quickAsk('⚡ Harry Potter')">⚡ Harry Potter</button>
                 <button class="quick-btn" onclick="quickAsk('🗓️ Today\'s plan')">🗓️ Today</button>
                 <button class="quick-btn" onclick="quickAsk('🍕 Pizza')">🍕 Pizza</button>
                 <button class="quick-btn" onclick="quickAsk('📸 Instagram spots')">📸 Insta</button>
                 <button class="quick-btn" onclick="quickAsk('🆓 Free stuff')">🆓 Free</button>
                 <button class="quick-btn" onclick="quickAsk('📍 Nearby')">📍 Nearby</button>
-                <button class="quick-btn" onclick="quickAsk('🎬 Movies')">🎬 Movies</button>
                 <button class="quick-btn" onclick="quickAsk('🎲 Surprise me')">🎲 Random</button>
             </div>
             <div class="chat-messages" id="chatMessages"></div>
@@ -1161,6 +1161,10 @@ Per revocare il consenso: Impostazioni → Cancella tutti i dati`);
         
         // Autocomplete suggestions data
         const autocompletePhrases = [
+            { icon: '📅', text: 'Plan my 3-day trip', category: 'trip' },
+            { icon: '📅', text: 'Plan my 2-day NYC weekend', category: 'trip' },
+            { icon: '⚡', text: 'Harry Potter 3-day tour', category: 'trip' },
+            { icon: '👨‍👩‍👧', text: 'Family trip 3 days', category: 'trip' },
             { icon: '⚡', text: 'Harry Potter spots', category: 'harrypotter' },
             { icon: '🗓️', text: 'What should I do today?', category: 'itinerary' },
             { icon: '🍕', text: 'Best pizza in NYC', category: 'food' },
@@ -1460,7 +1464,162 @@ Per revocare il consenso: Impostazioni → Cancella tutti i dati`);
             }
         };
         
+        // ============ MULTI-DAY ITINERARIES ============
+        const multiDayItineraries = {
+            classic3days: {
+                name: '3 Days Classic NYC',
+                icon: '🗽',
+                color: '#3498DB',
+                days: 3,
+                description: 'First time in NYC? This is THE itinerary!',
+                schedule: [
+                    { // Day 1 - Downtown & Statue
+                        title: 'Downtown & Lady Liberty',
+                        placeIds: [12, 14, 13, 9, 10],
+                        times: ['8:30', '12:00', '14:00', '16:00', '18:00'],
+                        tips: ['Book ferry early!', 'Free museum!', 'Moving memorial', 'Walk across!', 'Sunset photos']
+                    },
+                    { // Day 2 - Midtown Icons
+                        title: 'Midtown Icons',
+                        placeIds: [1, 11, 3, 4, 2],
+                        times: ['9:00', '12:00', '14:00', '16:30', '18:30'],
+                        tips: ['Buy tickets online', 'Walk around', 'Window shopping', 'Big flagship store', 'Sunset views!']
+                    },
+                    { // Day 3 - Central Park & Museums
+                        title: 'Central Park & Culture',
+                        placeIds: [7, 50, 51, 102, 119],
+                        times: ['9:00', '11:00', '14:00', '17:00', '19:00'],
+                        tips: ['Rent a bike!', 'Incredible art', 'Dino lovers!', 'Best NYC pizza', 'Frozen hot chocolate!']
+                    }
+                ]
+            },
+            harrypotter3days: {
+                name: '3 Days Harry Potter Magic',
+                icon: '⚡',
+                color: '#9B59B6',
+                days: 3,
+                description: 'The ultimate Potterhead NYC experience!',
+                schedule: [
+                    { // Day 1 - HP Store & Broadway
+                        title: 'The Wizarding World',
+                        placeIds: [81, 82, 84, 85, 90],
+                        times: ['10:00', '12:00', '13:30', '15:00', '19:00'],
+                        tips: ['Arrive 30min early!', 'Try frozen version', 'Interactive wands!', 'Chocolate frogs!', 'Lottery for $40!']
+                    },
+                    { // Day 2 - Fantastic Beasts & Mystery
+                        title: 'Fantastic Beasts NYC',
+                        placeIds: [83, 232, 56, 231, 101],
+                        times: ['10:00', '12:00', '14:00', '16:00', '18:00'],
+                        tips: ['Newt was here!', 'Ghostbusters too!', 'Mind-bending!', 'Kevin McCallister!', 'Magic cookies!']
+                    },
+                    { // Day 3 - Hidden Magic
+                        title: 'Secret Magical NYC',
+                        placeIds: [15, 5, 50, 7, 11],
+                        times: ['9:00', '11:00', '14:00', '16:30', '20:00'],
+                        tips: ['Looks like a movie set', 'Mirror selfies!', 'Egyptian wing = magic', 'Bethesda Fountain!', 'Night lights!']
+                    }
+                ]
+            },
+            instagram2days: {
+                name: '2 Days Instagram Perfect',
+                icon: '📸',
+                color: '#E91E63',
+                days: 2,
+                description: 'Get ALL the best photos for your feed!',
+                schedule: [
+                    { // Day 1 - Manhattan Shots
+                        title: 'Manhattan Must-Shots',
+                        placeIds: [10, 9, 5, 20, 2],
+                        times: ['7:00', '9:00', '11:00', '14:00', '17:30'],
+                        tips: ['Empty at 7am!', 'Walk to Manhattan', 'Wear colors!', 'Unique architecture', 'Sunset slot!']
+                    },
+                    { // Day 2 - Hidden Gems
+                        title: 'Hidden Photo Gems',
+                        placeIds: [15, 16, 24, 22, 11],
+                        times: ['8:00', '10:00', '12:00', '15:00', '19:00'],
+                        tips: ['Floating park!', 'Street art heaven', 'Rooftop views', 'Neon paradise!', 'Night shots!']
+                    }
+                ]
+            },
+            foodie2days: {
+                name: '2 Days Foodie Adventure',
+                icon: '🍕',
+                color: '#F39C12',
+                days: 2,
+                description: 'Eat your way through NYC!',
+                schedule: [
+                    { // Day 1 - Manhattan Classics
+                        title: 'Manhattan Classics',
+                        placeIds: [102, 109, 101, 104, 119],
+                        times: ['11:00', '13:00', '15:30', '17:00', '19:00'],
+                        tips: ['Plain cheese only!', 'Lox bagel!', 'Choc chip walnut!', 'Banana pudding!', 'Frozen hot choc!']
+                    },
+                    { // Day 2 - Brooklyn Bites
+                        title: 'Brooklyn Food Scene',
+                        placeIds: [110, 115, 10, 103, 108],
+                        times: ['10:00', '12:00', '14:00', '16:00', '18:30'],
+                        tips: ['Weekend only!', 'Thin crust!', 'Photo first!', 'Best cheesecake', 'NYC classic!']
+                    }
+                ]
+            },
+            family3days: {
+                name: '3 Days Family Fun',
+                icon: '👨‍👩‍👧',
+                color: '#2ECC71',
+                days: 3,
+                description: 'Perfect for families with kids & teens!',
+                schedule: [
+                    { // Day 1 - Fun & Games
+                        title: 'Fun & Games',
+                        placeIds: [4, 60, 61, 102, 11],
+                        times: ['10:00', '12:00', '14:30', '17:00', '19:00'],
+                        tips: ['3 floors of toys!', 'Doll customization', 'Chocolate making!', 'Kids love it!', 'Street performers!']
+                    },
+                    { // Day 2 - Discovery Day
+                        title: 'Discovery Day',
+                        placeIds: [51, 7, 55, 50, 119],
+                        times: ['9:30', '12:00', '14:30', '16:00', '18:30'],
+                        tips: ['Dinosaurs!', 'Playground + zoo', 'Interactive!', 'Egyptian mummies', 'Treat time!']
+                    },
+                    { // Day 3 - Adventure
+                        title: 'NYC Adventure',
+                        placeIds: [12, 10, 9, 5, 104],
+                        times: ['8:30', '12:00', '14:00', '16:30', '18:30'],
+                        tips: ['Ferry ride!', 'Ice cream stop', 'Walk together', 'Glass floor!', 'Dessert reward!']
+                    }
+                ]
+            },
+            movies3days: {
+                name: '3 Days Movie Locations',
+                icon: '🎬',
+                color: '#E74C3C',
+                days: 3,
+                description: 'Walk where your favorite movies were filmed!',
+                schedule: [
+                    { // Day 1 - Classic Movies
+                        title: 'Classic Movie Spots',
+                        placeIds: [233, 231, 232, 234, 102],
+                        times: ['10:00', '12:00', '14:00', '16:00', '18:00'],
+                        tips: ['Just exterior!', 'Lobby is free!', 'Still active!', 'Spidey spot!', 'Joe\'s = Spiderman!']
+                    },
+                    { // Day 2 - Avengers & More
+                        title: 'Superhero NYC',
+                        placeIds: [1, 235, 2, 11, 236],
+                        times: ['9:00', '11:00', '14:00', '16:30', '19:00'],
+                        tips: ['Avengers Tower!', 'Stark Industries', 'Many movies!', 'So many films!', 'Night museum!']
+                    },
+                    { // Day 3 - Romance & Drama
+                        title: 'Romance & Drama',
+                        placeIds: [239, 237, 7, 50, 9],
+                        times: ['10:00', '12:00', '14:00', '16:00', '18:00'],
+                        tips: ['Gossip Girl steps', 'Night at Museum!', 'Many romcoms!', 'GG inside too!', 'Spider-Man!']
+                    }
+                ]
+            }
+        };
+        
         let currentItinerary = null;
+        let currentMultiDayItinerary = null;
         
         function generateThemedItinerary(theme) {
             const itineraryData = themedItineraries[theme];
@@ -1625,6 +1784,185 @@ Per revocare il consenso: Impostazioni → Cancella tutti i dati`);
             }
         }
         
+        // ============ MULTI-DAY ITINERARY FUNCTIONS ============
+        function showMultiDayOptions() {
+            let response = `<div style="margin-bottom:10px;"><b>📅 Plan your NYC trip!</b></div>`;
+            response += `<div style="font-size:0.85em; color:#666; margin-bottom:15px;">Choose a multi-day itinerary:</div>`;
+            response += `<div class="itinerary-themes">`;
+            
+            Object.entries(multiDayItineraries).forEach(([key, itin]) => {
+                response += `
+                <div class="theme-btn" onclick="generateMultiDayItinerary('${key}')" style="border-left: 4px solid ${itin.color};">
+                    <div class="theme-icon">${itin.icon}</div>
+                    <div class="theme-info">
+                        <div class="theme-name">${itin.name}</div>
+                        <div class="theme-desc">${itin.days} days • ${itin.description}</div>
+                    </div>
+                </div>`;
+            });
+            
+            response += `</div>`;
+            addMessage(response, 'bot');
+        }
+        
+        function generateMultiDayItinerary(key) {
+            const itinerary = multiDayItineraries[key];
+            if (!itinerary) return;
+            
+            // Store for download
+            currentMultiDayItinerary = { key, data: itinerary };
+            
+            let response = `<div style="background:linear-gradient(135deg, ${itinerary.color}22, ${itinerary.color}11); padding:15px; border-radius:12px; border-left:4px solid ${itinerary.color};">
+                <div style="font-size:1.5em; margin-bottom:5px;">${itinerary.icon} <b>${itinerary.name}</b></div>
+                <div style="font-size:0.85em; color:#666; margin-bottom:10px;">${itinerary.description}</div>
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                    <span style="background:${itinerary.color}; color:white; padding:4px 10px; border-radius:15px; font-size:0.8em;">📅 ${itinerary.days} Days</span>
+                </div>
+            </div>`;
+            
+            let totalCost = 0;
+            let totalPlaces = 0;
+            
+            // Generate each day
+            itinerary.schedule.forEach((day, dayIndex) => {
+                response += `<div style="margin-top:20px; background:#f8f9fa; padding:12px; border-radius:10px;">
+                    <div style="font-weight:700; font-size:1.1em; color:${itinerary.color}; margin-bottom:10px;">
+                        📆 Day ${dayIndex + 1}: ${day.title}
+                    </div>`;
+                
+                // Get places for this day
+                const dayPlaces = day.placeIds.map(id => places.find(p => p.id === id)).filter(p => p);
+                totalPlaces += dayPlaces.length;
+                
+                dayPlaces.forEach((place, idx) => {
+                    if (place) {
+                        totalCost += place.cost;
+                        const time = day.times[idx] || '';
+                        const tip = day.tips[idx] || '';
+                        
+                        response += `
+                        <div class="itinerary-step" style="border-left-color: ${itinerary.color}; margin-top:8px;" onclick="focusPlace(${place.id})">
+                            <div class="step-number" style="background: ${itinerary.color};">${idx + 1}</div>
+                            <div class="step-content">
+                                <div class="step-name">
+                                    ${place.emoji} ${place.name}
+                                    <span class="step-time">${time}</span>
+                                </div>
+                                <div class="step-details">${formatDuration(place.duration)} • ${place.cost === 0 ? 'Free!' : '$' + place.cost}</div>
+                                ${tip ? `<div class="step-tip">💡 ${tip}</div>` : ''}
+                            </div>
+                        </div>`;
+                    }
+                });
+                
+                response += `</div>`;
+            });
+            
+            // Summary
+            response += `<div style="background:#e8f5e9; padding:12px; border-radius:10px; margin-top:15px;">
+                <b>📊 Trip Summary:</b> ${itinerary.days} days • ${totalPlaces} places • ${totalCost === 0 ? 'All FREE!' : '$' + totalCost + ' total'}
+            </div>`;
+            
+            // Action buttons
+            response += `<div class="itinerary-actions">
+                <button class="btn-download" onclick="downloadMultiDayItinerary()">📥 Download</button>
+                <button class="btn-share" onclick="shareMultiDayItinerary()">📤 Share</button>
+                <button class="btn-map" onclick="showMultiDayOnMap()">🗺️ Day 1 Map</button>
+            </div>`;
+            
+            addMessage(response, 'bot');
+        }
+        
+        function downloadMultiDayItinerary() {
+            if (!currentMultiDayItinerary) return;
+            
+            const { data: itinerary } = currentMultiDayItinerary;
+            let text = `NYC TEEN GUIDE - ${itinerary.name}\n`;
+            text += `${'='.repeat(50)}\n`;
+            text += `${itinerary.days} Days Itinerary\n\n`;
+            
+            itinerary.schedule.forEach((day, dayIndex) => {
+                text += `\n${'─'.repeat(40)}\n`;
+                text += `DAY ${dayIndex + 1}: ${day.title}\n`;
+                text += `${'─'.repeat(40)}\n\n`;
+                
+                const dayPlaces = day.placeIds.map(id => places.find(p => p.id === id)).filter(p => p);
+                
+                dayPlaces.forEach((place, idx) => {
+                    if (place) {
+                        text += `${day.times[idx] || ''} - ${place.emoji} ${place.name}\n`;
+                        text += `   📍 ${place.address}\n`;
+                        text += `   ⏱️ ${formatDuration(place.duration)} • ${place.cost === 0 ? 'Free' : '$' + place.cost}\n`;
+                        if (day.tips[idx]) text += `   💡 ${day.tips[idx]}\n`;
+                        text += `\n`;
+                    }
+                });
+            });
+            
+            text += `\n${'='.repeat(50)}\n`;
+            text += `Generated by NYC Teen Guide\n`;
+            text += `https://cato1978.github.io/nyc-teen-guide/\n`;
+            
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `NYC-${itinerary.days}Days-${itinerary.name.replace(/\s+/g, '-')}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        function shareMultiDayItinerary() {
+            if (!currentMultiDayItinerary) return;
+            
+            const { data: itinerary } = currentMultiDayItinerary;
+            let text = `🗽 My ${itinerary.days}-Day NYC Trip: ${itinerary.icon} ${itinerary.name}\n\n`;
+            
+            itinerary.schedule.forEach((day, dayIndex) => {
+                text += `📆 Day ${dayIndex + 1}: ${day.title}\n`;
+                const dayPlaces = day.placeIds.map(id => places.find(p => p.id === id)).filter(p => p);
+                dayPlaces.forEach((place, idx) => {
+                    text += `  ${idx + 1}. ${place.emoji} ${place.name}\n`;
+                });
+                text += `\n`;
+            });
+            
+            text += `\n📱 Plan yours: https://cato1978.github.io/nyc-teen-guide/`;
+            
+            if (navigator.share) {
+                navigator.share({ title: `NYC ${itinerary.days}-Day Itinerary`, text: text });
+            } else {
+                copyToClipboard(text);
+            }
+        }
+        
+        function showMultiDayOnMap() {
+            if (!currentMultiDayItinerary) return;
+            
+            const { data: itinerary } = currentMultiDayItinerary;
+            const day1Places = itinerary.schedule[0].placeIds.map(id => places.find(p => p.id === id)).filter(p => p);
+            
+            // Close chat
+            document.getElementById('chatContainer').classList.remove('open');
+            
+            // Fit map to Day 1 places
+            if (day1Places.length > 0) {
+                const bounds = L.latLngBounds(day1Places.map(p => [p.lat, p.lng]));
+                map.fitBounds(bounds, { padding: [50, 50] });
+                
+                setTimeout(() => {
+                    const firstPlace = day1Places[0];
+                    markers.forEach(m => {
+                        if (m.placeId === firstPlace.id) {
+                            m.openPopup();
+                        }
+                    });
+                }, 500);
+            }
+        }
+        
         // Quartieri di NYC per ricerca per zona
         const neighborhoods = {
             'soho': { bounds: [40.719, -74.005, 40.728, -73.995], name: 'SoHo' },
@@ -1705,11 +2043,27 @@ Per revocare il consenso: Impostazioni → Cancella tutti i dati`);
             
             // ============ NUOVE FUNZIONALITÀ ============
             
+            // 0. MULTI-DAY TRIP PLANNING
+            if (m.includes('2 day') || m.includes('3 day') || m.includes('4 day') || m.includes('trip') || m.includes('giorni') || m.includes('days') || m.includes('plan my') || m.includes('vacation') || m.includes('viaggio') || m.includes('weekend') || m.includes('multi')) {
+                showMultiDayOptions();
+                return '';
+            }
+            
             // 1. ITINERARIO GIORNALIERO - Mostra opzioni tematiche
             if (matchKeyword('itinerary')) {
-                response = currentLang === 'en' 
-                    ? '🗓️ <b>Choose your perfect day in NYC!</b><br>Pick a theme that suits you:'
-                    : '🗓️ <b>Scegli la tua giornata perfetta a NYC!</b><br>Seleziona un tema:';
+                response = `🗓️ <b>What would you like?</b><br><br>`;
+                response += `<div style="display:flex; flex-direction:column; gap:10px;">
+                    <div class="theme-btn" onclick="showMultiDayOptions()" style="border-left:4px solid #3498db; background:linear-gradient(135deg, #3498db11, #3498db05);">
+                        <span class="theme-icon">📅</span>
+                        <div class="theme-info">
+                            <div class="theme-name">Multi-Day Trip (2-3 days)</div>
+                            <div class="theme-desc">Complete trip planning with daily schedules</div>
+                        </div>
+                    </div>
+                    <div style="text-align:center; color:#888; font-size:0.8em;">— OR —</div>
+                </div>`;
+                
+                response += `<div style="margin-top:5px; font-size:0.9em;"><b>Single Day Themes:</b></div>`;
                 
                 response += `<div class="itinerary-themes">
                     <div class="theme-btn" onclick="generateThemedItinerary('harrypotter')">
